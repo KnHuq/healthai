@@ -16,6 +16,7 @@ import backgroundImage from "./backgroundimage.png";
 const LoginSignupPage = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [isAdminAuth, setIsAdminAuth] = useState(false);
+  const [registrationSuccess, setRegistrationSuccess] = useState(false); // State to manage registration success
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
@@ -30,7 +31,6 @@ const LoginSignupPage = () => {
         },
         body: JSON.stringify({ adminPassword: adminPassword }),
       });
-
       const data = await response.json();
       if (data.success) {
         setIsAdminAuth(true);
@@ -43,6 +43,27 @@ const LoginSignupPage = () => {
     }
   };
 
+  const handleLogin = async () => {
+    try {
+      const response = await fetch(`${SERVER_URL}/api/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username: username, password: password }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        alert("Logged in successfully");
+        // Implement your logic here after successful login, e.g., redirect to another page
+      } else {
+        alert("Login failed: " + data.message);
+      }
+    } catch (error) {
+      console.error("Error logging in:", error);
+    }
+  };
+
   const handleRegister = async () => {
     try {
       const response = await fetch(`${SERVER_URL}/api/register`, {
@@ -52,24 +73,26 @@ const LoginSignupPage = () => {
         },
         body: JSON.stringify({ username: username, password: password }),
       });
-
       const data = await response.json();
       if (data.success) {
-        alert("Account created successfully");
-        // Reset the form or redirect the user as needed
+        setRegistrationSuccess(true); // Show success message and button to return to login
       } else if (data.message === "Username not available") {
-        alert(
-          `Username "${username}" is not available. Suggestions: ${data.suggestions.join(
-            ", "
-          )}`
-        );
-        // Optionally, you can do something with the suggestions, like displaying them to the user
+        alert(`Username "${username}" is not available.`);
       } else {
         alert("Error creating account");
       }
     } catch (error) {
       console.error("Error registering account:", error);
     }
+  };
+
+  const returnToLogin = () => {
+    setIsLogin(true);
+    setIsAdminAuth(false);
+    setRegistrationSuccess(false);
+    setUsername("");
+    setPassword("");
+    setAdminPassword("");
   };
 
   return (
@@ -83,7 +106,6 @@ const LoginSignupPage = () => {
               className="rounded-start w-100"
             />
           </MDBCol>
-
           <MDBCol md="6">
             <MDBCardBody className="d-flex flex-column">
               <div className="d-flex flex-row mt-2">
@@ -94,100 +116,118 @@ const LoginSignupPage = () => {
                 />
                 <span className="h1 fw-bold mb-0">QueensLand Health AI</span>
               </div>
-
               <h5
                 className="fw-normal my-4 pb-3"
                 style={{ letterSpacing: "1px" }}
               >
-                Sign into your account
+                {isLogin ? "Sign into your account" : "Admin Registration"}
               </h5>
 
-              {isLogin && !isAdminAuth && (
+              {registrationSuccess ? (
                 <>
-                  <MDBInput
-                    wrapperClass="mb-4"
-                    label="Username"
-                    id="formControlLg"
-                    type="text"
-                    size="lg"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                  />
-                  <MDBInput
-                    wrapperClass="mb-4"
-                    label="Password"
-                    id="formControlLg"
-                    type="password"
-                    size="lg"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                  <MDBBtn className="mb-4 px-5" color="dark" size="lg">
-                    Login
-                  </MDBBtn>
-                  <p className="mb-5 pb-lg-2" style={{ color: "#393f81" }}>
-                    Don't have an account?{" "}
-                    <a
-                      href="#!"
-                      onClick={() => setIsLogin(false)}
-                      style={{ color: "#393f81" }}
-                    >
-                      Create New Account
-                    </a>
-                  </p>
-                </>
-              )}
-
-              {!isLogin && !isAdminAuth && (
-                <>
-                  <MDBInput
-                    wrapperClass="mb-4"
-                    label="Admin Password"
-                    id="adminPassword"
-                    type="password"
-                    size="lg"
-                    value={adminPassword}
-                    onChange={(e) => setAdminPassword(e.target.value)}
-                  />
-                  <MDBBtn
-                    className="mb-4 px-5"
-                    color="dark"
-                    size="lg"
-                    onClick={handleAdminAuth}
-                  >
-                    Verify Admin
+                  <div>
+                    Registration Successful, Return to the Login Page and Sign
+                    in.
+                  </div>
+                  <MDBBtn color="dark" onClick={returnToLogin}>
+                    Return to Login
                   </MDBBtn>
                 </>
-              )}
-
-              {!isLogin && isAdminAuth && (
+              ) : (
                 <>
-                  <MDBInput
-                    wrapperClass="mb-4"
-                    label="Username"
-                    id="formControlLg"
-                    type="text"
-                    size="lg"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                  />
-                  <MDBInput
-                    wrapperClass="mb-4"
-                    label="Password"
-                    id="formControlLg"
-                    type="password"
-                    size="lg"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                  <MDBBtn
-                    className="mb-4 px-5"
-                    color="dark"
-                    size="lg"
-                    onClick={handleRegister}
-                  >
-                    Create Account
-                  </MDBBtn>
+                  {isLogin && !isAdminAuth && (
+                    <>
+                      <MDBInput
+                        wrapperClass="mb-4"
+                        label="Username"
+                        id="formControlLg"
+                        type="text"
+                        size="lg"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                      />
+                      <MDBInput
+                        wrapperClass="mb-4"
+                        label="Password"
+                        id="formControlLg"
+                        type="password"
+                        size="lg"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                      <MDBBtn
+                        className="mb-4 px-5"
+                        color="dark"
+                        size="lg"
+                        onClick={handleLogin}
+                      >
+                        Login
+                      </MDBBtn>
+                      <p className="mb-5 pb-lg-2" style={{ color: "#393f81" }}>
+                        Don't have an account?{" "}
+                        <a
+                          href="#!"
+                          onClick={() => setIsLogin(false)}
+                          style={{ color: "#393f81" }}
+                        >
+                          Create New Account
+                        </a>
+                      </p>
+                    </>
+                  )}
+
+                  {!isLogin && !isAdminAuth && (
+                    <>
+                      <MDBInput
+                        wrapperClass="mb-4"
+                        label="Admin Password"
+                        id="adminPassword"
+                        type="password"
+                        size="lg"
+                        value={adminPassword}
+                        onChange={(e) => setAdminPassword(e.target.value)}
+                      />
+                      <MDBBtn
+                        className="mb-4 px-5"
+                        color="dark"
+                        size="lg"
+                        onClick={handleAdminAuth}
+                      >
+                        Verify Admin
+                      </MDBBtn>
+                    </>
+                  )}
+
+                  {!isLogin && isAdminAuth && (
+                    <>
+                      <MDBInput
+                        wrapperClass="mb-4"
+                        label="Username"
+                        id="formControlLg"
+                        type="text"
+                        size="lg"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                      />
+                      <MDBInput
+                        wrapperClass="mb-4"
+                        label="Password"
+                        id="formControlLg"
+                        type="password"
+                        size="lg"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                      />
+                      <MDBBtn
+                        className="mb-4 px-5"
+                        color="dark"
+                        size="lg"
+                        onClick={handleRegister}
+                      >
+                        Create Account
+                      </MDBBtn>
+                    </>
+                  )}
                 </>
               )}
             </MDBCardBody>
