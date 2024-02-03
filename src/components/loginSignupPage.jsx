@@ -195,6 +195,14 @@ const LoginSignupPage = () => {
                       >
                         Verify Admin
                       </MDBBtn>
+                      <MDBBtn
+                        className="mb-4 px-5"
+                        color="dark"
+                        size="lg"
+                        onClick={returnToLogin}
+                      >
+                        Return to Login
+                      </MDBBtn>
                     </>
                   )}
 
