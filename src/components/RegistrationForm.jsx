@@ -1,6 +1,7 @@
+// RegistrationForm.jsx
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for programmatic navigation
-import "./loginSignupPage.css";
+import { useNavigate } from "react-router-dom";
+import "./loginSignupPage.css"; // Reusing the same CSS for consistency
 import {
   MDBBtn,
   MDBContainer,
@@ -14,37 +15,37 @@ import {
 } from "mdb-react-ui-kit";
 import backgroundImage from "./backgroundimage.png";
 
-const LoginSignupPage = () => {
+const RegistrationForm = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const SERVER_URL = "http://localhost:5000";
-  const navigate = useNavigate(); // useNavigate hook for navigation
+  const SERVER_URL = "http://localhost:5000"; // Ensure this is your actual server URL
+  const navigate = useNavigate();
 
-  const handleLogin = async () => {
+  const handleRegister = async () => {
     try {
-      const response = await fetch(`${SERVER_URL}/api/login`, {
+      const response = await fetch(`${SERVER_URL}/api/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username: username, password: password }),
+        body: JSON.stringify({ username, password }),
       });
       const data = await response.json();
       if (data.success) {
-        navigate("/welcome"); // Navigate to the welcome page upon successful login
+        // Optionally, navigate to login page or show a success message
+        alert("Registration successful. Please log in.");
+        navigate("/"); // Assuming '/' is your login route
       } else {
-        alert("Login failed: " + data.message);
+        alert("Registration failed: " + data.message);
       }
     } catch (error) {
-      console.error("Error logging in:", error);
+      console.error("Error during registration:", error);
     }
   };
 
-  const handleNavigateToAdminAuth = () => {
-    navigate("/admin-auth"); // Navigate to the admin authentication page
+  const returnToLogin = () => {
+    navigate("/"); // Navigate back to the login page
   };
-
-  
 
   return (
     <MDBContainer className="my-5">
@@ -62,21 +63,21 @@ const LoginSignupPage = () => {
               <div className="d-flex flex-row mt-2">
                 <MDBIcon
                   fas
-                  icon="cubes fa-3x me-3"
+                  icon="user-plus fa-3x me-3"
                   style={{ color: "#ff6219" }}
                 />
-                <span className="h1 fw-bold mb-0">QueensLand Health AI</span>
+                <span className="h1 fw-bold mb-0">Register</span>
               </div>
               <h5
                 className="fw-normal my-4 pb-3"
                 style={{ letterSpacing: "1px" }}
               >
-                Sign into your account
+                Please Set A User Name and Password
               </h5>
               <MDBInput
                 wrapperClass="mb-4"
                 label="Username"
-                id="formControlLg"
+                id="username"
                 type="text"
                 size="lg"
                 value={username}
@@ -85,7 +86,7 @@ const LoginSignupPage = () => {
               <MDBInput
                 wrapperClass="mb-4"
                 label="Password"
-                id="formControlLg"
+                id="password"
                 type="password"
                 size="lg"
                 value={password}
@@ -95,20 +96,18 @@ const LoginSignupPage = () => {
                 className="mb-4 px-5"
                 color="dark"
                 size="lg"
-                onClick={handleLogin}
+                onClick={handleRegister}
               >
-                Login
+                Register
               </MDBBtn>
-              <p className="mb-5 pb-lg-2" style={{ color: "#393f81" }}>
-                Don't have an account?{" "}
-                <a
-                  href="#!"
-                  onClick={handleNavigateToAdminAuth}
-                  style={{ color: "#393f81" }}
-                >
-                  Create New Account
-                </a>
-              </p>
+              <MDBBtn
+                className="mb-4 px-5"
+                color="light"
+                size="lg"
+                onClick={returnToLogin}
+              >
+                Return to Login
+              </MDBBtn>
             </MDBCardBody>
           </MDBCol>
         </MDBRow>
@@ -117,4 +116,4 @@ const LoginSignupPage = () => {
   );
 };
 
-export default LoginSignupPage;
+export default RegistrationForm;
