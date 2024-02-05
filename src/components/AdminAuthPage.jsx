@@ -16,9 +16,9 @@ import backgroundImage from "./backgroundimage.png";
 
 const AdminAuthPage = () => {
   const [adminPassword, setAdminPassword] = useState("");
-  const SERVER_URL = "http://localhost:5000"; // Ensure this is your actual server URL
+  const [feedback, setFeedback] = useState(""); // Added state for feedback
+  const SERVER_URL = "http://localhost:5000";
   const navigate = useNavigate();
-
 
   const handleAdminAuth = async () => {
     try {
@@ -27,17 +27,20 @@ const AdminAuthPage = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ adminPassword: adminPassword }),
+        body: JSON.stringify({ adminPassword }),
       });
       const data = await response.json();
       if (data.success) {
         // Navigate to the registration form
         navigate("/register");
       } else {
-        alert("Admin password is incorrect");
+        // Update to use inline feedback instead of alert
+        setFeedback("Admin password is incorrect");
       }
     } catch (error) {
       console.error("Error verifying admin password:", error);
+      // Optionally, provide feedback for network or server errors
+      setFeedback("An error occurred during verification. Please try again.");
     }
   };
 
@@ -69,7 +72,11 @@ const AdminAuthPage = () => {
               <h5
                 className="fw-normal my-4 pb-3"
                 style={{ letterSpacing: "1px" }}
-              >Please Enter Admin Password</h5>
+              >
+                Please Enter Admin Password
+              </h5>
+              {feedback && <div className="text-danger mb-3">{feedback}</div>}{" "}
+              {/* Inline feedback display */}
               <MDBInput
                 wrapperClass="mb-4"
                 label="Admin Password"

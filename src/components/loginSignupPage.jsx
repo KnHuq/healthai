@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Import useNavigate for programmatic navigation
+import { useNavigate } from "react-router-dom";
 import "./loginSignupPage.css";
 import {
   MDBBtn,
@@ -17,8 +17,9 @@ import backgroundImage from "./backgroundimage.png";
 const LoginSignupPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [loginFeedback, setLoginFeedback] = useState(""); // New state variable for login feedback
   const SERVER_URL = "http://localhost:5000";
-  const navigate = useNavigate(); // useNavigate hook for navigation
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
     try {
@@ -33,18 +34,17 @@ const LoginSignupPage = () => {
       if (data.success) {
         navigate("/welcome"); // Navigate to the welcome page upon successful login
       } else {
-        alert("Login failed: " + data.message);
+        setLoginFeedback("Login failed: " + data.message); // Update the feedback state instead of using alert
       }
     } catch (error) {
       console.error("Error logging in:", error);
+      setLoginFeedback("Error during login attempt."); // Optionally provide more detailed error feedback
     }
   };
 
   const handleNavigateToAdminAuth = () => {
-    navigate("/admin-auth"); // Navigate to the admin authentication page
+    navigate("/admin-auth");
   };
-
-  
 
   return (
     <MDBContainer className="my-5">
@@ -73,6 +73,9 @@ const LoginSignupPage = () => {
               >
                 Sign into your account
               </h5>
+              {loginFeedback && (
+                <div className="text-danger mb-3">{loginFeedback}</div>
+              )}
               <MDBInput
                 wrapperClass="mb-4"
                 label="Username"

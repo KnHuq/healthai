@@ -1,7 +1,6 @@
-// RegistrationForm.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "./loginSignupPage.css"; // Reusing the same CSS for consistency
+import "./loginSignupPage.css";
 import {
   MDBBtn,
   MDBContainer,
@@ -18,10 +17,28 @@ import backgroundImage from "./backgroundimage.png";
 const RegistrationForm = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const SERVER_URL = "http://localhost:5000"; // Ensure this is your actual server URL
+  const [feedback, setFeedback] = useState("");
+  const [feedbackType, setFeedbackType] = useState(""); // "success" or "error"
+  const SERVER_URL = "http://localhost:5000";
   const navigate = useNavigate();
 
+  // Validation function for the password
+  const validatePassword = (password) => {
+    const regex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return regex.test(password);
+  };
+
   const handleRegister = async () => {
+    // Check if the password is valid
+    if (!validatePassword(password)) {
+      setFeedback(
+        "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, and one special character."
+      );
+      setFeedbackType("error");
+      return; // Stop the registration process
+    }
+
     try {
       const response = await fetch(`${SERVER_URL}/api/register`, {
         method: "POST",
@@ -32,20 +49,27 @@ const RegistrationForm = () => {
       });
       const data = await response.json();
       if (data.success) {
+        setFeedback("Registration successful. Please log in.");
+        setFeedbackType("success");
         // Optionally, navigate to login page or show a success message
-        alert("Registration successful. Please log in.");
-        navigate("/"); // Assuming '/' is your login route
+        setTimeout(() => navigate("/"), 3000); // Assuming '/' is your login route
       } else {
-        alert("Registration failed: " + data.message);
+        setFeedback("Registration failed: " + data.message);
+        setFeedbackType("error");
       }
     } catch (error) {
       console.error("Error during registration:", error);
+      setFeedback("Error during registration: " + error.message);
+      setFeedbackType("error");
     }
   };
 
   const returnToLogin = () => {
     navigate("/"); // Navigate back to the login page
   };
+
+  const feedbackStyle =
+    feedbackType === "success" ? "text-success" : "text-danger";
 
   return (
     <MDBContainer className="my-5">
@@ -74,6 +98,9 @@ const RegistrationForm = () => {
               >
                 Please Set A User Name and Password
               </h5>
+              {feedback && (
+                <div className={`mb-3 ${feedbackStyle}`}>{feedback}</div>
+              )}
               <MDBInput
                 wrapperClass="mb-4"
                 label="Username"
