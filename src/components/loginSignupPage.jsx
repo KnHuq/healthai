@@ -12,7 +12,7 @@ import {
   MDBIcon,
   MDBInput,
 } from "mdb-react-ui-kit";
-import backgroundImage from "./backgroundimage.png";
+import backgroundImage from "./backgroundimage3.jpg";
 
 const LoginSignupPage = () => {
   const [username, setUsername] = useState("");
@@ -63,7 +63,7 @@ const LoginSignupPage = () => {
                 <MDBIcon
                   fas
                   icon="cubes fa-3x me-3"
-                  style={{ color: "#ff6219" }}
+                  style={{ color: "#1938ff" }}
                 />
                 <span className="h1 fw-bold mb-0">QueensLand Health AI</span>
               </div>

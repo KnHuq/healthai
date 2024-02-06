@@ -12,7 +12,7 @@ import {
   MDBIcon,
   MDBInput,
 } from "mdb-react-ui-kit";
-import backgroundImage from "./backgroundimage.png";
+import backgroundImage from "./backgroundimage3.jpg";
 
 const AdminAuthPage = () => {
   const [adminPassword, setAdminPassword] = useState("");
@@ -65,7 +65,7 @@ const AdminAuthPage = () => {
                 <MDBIcon
                   fas
                   icon="user-shield fa-3x me-3"
-                  style={{ color: "#ff6219" }}
+                  style={{ color: "#1938ff" }}
                 />
                 <span className="h1 fw-bold mb-0">Admin Authentication</span>
               </div>

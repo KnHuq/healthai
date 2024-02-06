@@ -12,7 +12,7 @@ import {
   MDBIcon,
   MDBInput,
 } from "mdb-react-ui-kit";
-import backgroundImage from "./backgroundimage.png";
+import backgroundImage from "./backgroundimage3.jpg";
 
 const RegistrationForm = () => {
   const [username, setUsername] = useState("");
@@ -88,7 +88,7 @@ const RegistrationForm = () => {
                 <MDBIcon
                   fas
                   icon="user-plus fa-3x me-3"
-                  style={{ color: "#ff6219" }}
+                  style={{ color: "#1938ff" }}
                 />
                 <span className="h1 fw-bold mb-0">Register</span>
               </div>

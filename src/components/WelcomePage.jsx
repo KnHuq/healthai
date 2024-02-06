@@ -10,7 +10,7 @@ import {
     MDBIcon,
   } from "mdb-react-ui-kit";
 import { useNavigate } from 'react-router-dom';
-import backgroundImage from "./backgroundimage.png";
+import backgroundImage from "./backgroundimage3.jpg";
 
 
 const WelcomePage = () => {
@@ -37,7 +37,7 @@ const WelcomePage = () => {
                 <MDBIcon
                   fas
                   icon="cubes fa-3x me-3"
-                  style={{ color: "#ff6219" }}
+                  style={{ color: "#1938ff" }}
                 />
                 <span className="h1 fw-bold mb-0">QueensLand Health AI</span>
               </div>
