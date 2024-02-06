@@ -1,3 +1,24 @@
+@keyframes moveLight {
+  0% {
+    stroke-dashoffset: 100;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.svg-light-path {
+  stroke: #00f; /* Your desired light color */
+  stroke-width: 2;
+  stroke-dasharray: 5 5;
+  stroke-dashoffset: 0;
+  animation: moveLight 2s linear infinite;
+}
+
 body {
-  background-color: #9A616D;
+  /* Set your static background image; it can be a darkened version of your circuit image without the lights */
+  background-image: url("bodybackground.webp");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
 }
