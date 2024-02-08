@@ -2,17 +2,14 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./loginSignupPage.css";
 import {
-  MDBBtn,
-  MDBContainer,
-  MDBCard,
-  MDBCardBody,
-  MDBCardImage,
-  MDBRow,
-  MDBCol,
-  MDBIcon,
-  MDBInput,
+    MDBBtn,
+    MDBContainer,
+    MDBRow,
+    MDBCol,
+    MDBCard,
+    MDBCardBody,
+    MDBInput,
 } from "mdb-react-ui-kit";
-import backgroundImage from "./backgroundimage3.jpg";
 
 const LoginSignupPage = () => {
   const [username, setUsername] = useState("");
@@ -47,37 +44,25 @@ const LoginSignupPage = () => {
   };
 
   return (
-    <MDBContainer className="my-5">
-      <MDBCard>
-        <MDBRow className="g-0">
-          <MDBCol md="6">
-            <MDBCardImage
-              src={backgroundImage}
-              alt="Background"
-              className="rounded-start w-100"
-            />
-          </MDBCol>
-          <MDBCol md="6">
-            <MDBCardBody className="d-flex flex-column">
-              <div className="d-flex flex-row mt-2">
-                <MDBIcon
-                  fas
-                  icon="cubes fa-3x me-3"
-                  style={{ color: "#1938ff" }}
-                />
-                <span className="h1 fw-bold mb-0">QueensLand Health AI</span>
-              </div>
-              <h5
-                className="fw-normal my-4 pb-3"
-                style={{ letterSpacing: "1px" }}
-              >
-                Sign into your account
-              </h5>
+    <MDBContainer fluid>
+      <MDBRow className="d-flex justify-content-center align-items-center h-100">
+        <MDBCol col="12">
+          <MDBCard
+            className="bg-dark text-white my-5 mx-auto"
+            style={{ borderRadius: "1rem", maxWidth: "400px" }}
+          >
+            <MDBCardBody className="p-5 d-flex flex-column align-items-center mx-auto w-100">
+              <h2 className="fw-bold mb-2 text-uppercase">Login</h2>
+              <p className="text-white-50 mb-5">
+                Please enter your login and password!
+              </p>
+
               {loginFeedback && (
                 <div className="text-danger mb-3">{loginFeedback}</div>
               )}
               <MDBInput
-                wrapperClass="mb-4"
+                wrapperClass="mb-4 mx-5 w-100"
+                labelClass="text-white"
                 label="Username"
                 id="formControlLg"
                 type="text"
@@ -86,7 +71,8 @@ const LoginSignupPage = () => {
                 onChange={(e) => setUsername(e.target.value)}
               />
               <MDBInput
-                wrapperClass="mb-4"
+                wrapperClass="mb-4 mx-5 w-100"
+                labelClass="text-white"
                 label="Password"
                 id="formControlLg"
                 type="password"
@@ -94,28 +80,34 @@ const LoginSignupPage = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <MDBBtn
-                className="mb-4 px-5"
-                color="dark"
-                size="lg"
-                onClick={handleLogin}
-              >
-                Login
-              </MDBBtn>
-              <p className="mb-5 pb-lg-2" style={{ color: "#393f81" }}>
-                Don't have an account?{" "}
-                <a
-                  href="#!"
-                  onClick={handleNavigateToAdminAuth}
-                  style={{ color: "#393f81" }}
-                >
-                  Create New Account
+
+              <p className="small mb-3 pb-lg-2">
+                <a class="text-white-50" href="#!">
+                 
                 </a>
               </p>
+              <MDBBtn outline className="mx-2 px-5" color="white" size="lg" onClick={handleLogin}>
+                Login
+              </MDBBtn>
+
+              <div className="d-flex flex-row mt-3 mb-5">
+                <div className='m-3' size="lg"></div>
+                <div className='m-3' size="lg"></div>
+                <div className='m-3' size="lg"></div>
+              </div>
+
+              <div>
+                <p className="mb-0">
+                  Don't have an account?{" "}
+                  <a href="#!" onClick={handleNavigateToAdminAuth} class="text-white-50 fw-bold">
+                    Sign Up
+                  </a>
+                </p>
+              </div>
             </MDBCardBody>
-          </MDBCol>
-        </MDBRow>
-      </MDBCard>
+          </MDBCard>
+        </MDBCol>
+      </MDBRow>
     </MDBContainer>
   );
 };

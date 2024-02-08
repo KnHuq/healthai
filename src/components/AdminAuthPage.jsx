@@ -2,17 +2,15 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./loginSignupPage.css"; // Reusing the same CSS for consistency
 import {
-  MDBBtn,
-  MDBContainer,
-  MDBCard,
-  MDBCardBody,
-  MDBCardImage,
-  MDBRow,
-  MDBCol,
-  MDBIcon,
-  MDBInput,
-} from "mdb-react-ui-kit";
-import backgroundImage from "./backgroundimage3.jpg";
+    MDBBtn,
+    MDBContainer,
+    MDBRow,
+    MDBCol,
+    MDBCard,
+    MDBCardBody,
+    MDBInput,
+  }
+  from 'mdb-react-ui-kit';
 
 const AdminAuthPage = () => {
   const [adminPassword, setAdminPassword] = useState("");
@@ -49,63 +47,40 @@ const AdminAuthPage = () => {
   };
 
   return (
-    <MDBContainer className="my-5">
-      <MDBCard>
-        <MDBRow className="g-0">
-          <MDBCol md="6">
-            <MDBCardImage
-              src={backgroundImage}
-              alt="Background"
-              className="rounded-start w-100"
-            />
-          </MDBCol>
-          <MDBCol md="6">
-            <MDBCardBody className="d-flex flex-column">
-              <div className="d-flex flex-row mt-2">
-                <MDBIcon
-                  fas
-                  icon="user-shield fa-3x me-3"
-                  style={{ color: "#1938ff" }}
-                />
-                <span className="h1 fw-bold mb-0">Admin Authentication</span>
-              </div>
-              <h5
-                className="fw-normal my-4 pb-3"
-                style={{ letterSpacing: "1px" }}
-              >
-                Please Enter Admin Password
-              </h5>
+    <MDBContainer fluid>
+
+      <MDBRow className='d-flex justify-content-center align-items-center h-100'>
+        <MDBCol col='12'>
+
+          <MDBCard className='bg-dark text-white my-5 mx-auto' style={{borderRadius: '1rem', maxWidth: '400px'}}>
+            <MDBCardBody className='p-5 d-flex flex-column align-items-center mx-auto w-100'>
+
+              <h2 className="fw-bold mb-2 text-uppercase">ADMIN</h2>
+              <p className="text-white-50 mb-5">Please enter your Admin password!</p>
+
               {feedback && <div className="text-danger mb-3">{feedback}</div>}{" "}
               {/* Inline feedback display */}
-              <MDBInput
-                wrapperClass="mb-4"
-                label="Admin Password"
-                id="adminPassword"
-                type="password"
-                size="lg"
-                value={adminPassword}
-                onChange={(e) => setAdminPassword(e.target.value)}
-              />
-              <MDBBtn
-                className="mb-4 px-5"
-                color="dark"
-                size="lg"
-                onClick={handleAdminAuth}
-              >
-                Verify Admin
+              <MDBInput wrapperClass='mb-4 mx-5 w-100' labelClass='text-white' label="Admin Password" id="adminPassword" type='password' size="lg" value={adminPassword} onChange={(e) => setAdminPassword(e.target.value)}/>
+
+              <p className="small mb-3 pb-lg-2"><a class="text-white-50" href="#!">Forgot password?</a></p>
+              <MDBBtn outline className='mx-2 px-5' color='white' size='lg' onClick={handleAdminAuth}>
+                Varify Admin
               </MDBBtn>
-              <MDBBtn
-                className="mb-4 px-5"
-                color="light"
-                size="lg"
-                onClick={returnToLogin}
-              >
-                Return to Login
-              </MDBBtn>
+
+              <div className='d-flex flex-row mt-3 mb-5'>
+                
+              </div>
+
+              <div>
+                <p className="mb-0">Have an account? <a href="#!" onClick={returnToLogin} class="text-white-50 fw-bold">Sign In</a></p>
+
+              </div>
             </MDBCardBody>
-          </MDBCol>
-        </MDBRow>
-      </MDBCard>
+          </MDBCard>
+
+        </MDBCol>
+      </MDBRow>
+
     </MDBContainer>
   );
 };
