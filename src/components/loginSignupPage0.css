@@ -1,0 +1,7 @@
+body {
+  /* Set your static background image; it can be a darkened version of your circuit image without the lights */
+  background-image: url("bodybackground.webp");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
