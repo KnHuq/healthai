@@ -21,11 +21,12 @@ const CustomSidebar = () => {
         className="sidebar-header"
         onClick={() => setIsCollapsed(!isCollapsed)}
       >
-        <i className="fas fa-bars fa-lg sidebar-icon"></i>{" "}
-        {/* Ensure you have Font Awesome included */}
-        <h2 className={`sidebar-title ${isCollapsed ? "hidden" : ""}`}>
-          HealthAI
-        </h2>
+        <span className="icon-text-wrapper">
+          <i className="fas fa-bars fa-lg" style={{ marginRight: "10px" }}></i>{" "}
+          {/* Icon always visible */}
+          {!isCollapsed && <span className="header-text">HealthAI</span>}{" "}
+          {/* Text hidden on collapse */}
+        </span>
       </div>
 
       <ul className="sidebar-nav">
