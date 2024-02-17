@@ -1,0 +1,18 @@
+.upload-form-sidebar {
+    width: auto; /* Adjust based on the desired width of your upload form sidebar */
+    height: 100vh;
+    background-color: var(--background); /* Adjust if you have a specific color variable or use a direct color value */
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: width 0.3s ease;
+    margin-left: auto; /* This helps in positioning the sidebar to the right */
+  }
+  
+  .upload-form-sidebar.collapsed {
+    width: 80px; /* Adjust if you want a different collapsed width */
+  }
+  
+  /* You can redefine other necessary styles similar to CustomSidebar.css, ensuring they are specific to UploadFormSidebar */
+  
