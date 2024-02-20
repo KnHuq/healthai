@@ -21,12 +21,10 @@ const CustomSidebar = () => {
         className="sidebar-header"
         onClick={() => setIsCollapsed(!isCollapsed)}
       >
-        <span className="icon-text-wrapper">
-          <i className="fas fa-bars fa-lg" style={{ marginRight: "10px" }}></i>{" "}
-          {/* Icon always visible */}
-          {!isCollapsed && <span className="header-text">HealthAI</span>}{" "}
-          {/* Text hidden on collapse */}
-        </span>
+        {/* Toggle button or area to click for collapsing */}
+        <h2 className={`sidebar-title ${isCollapsed ? "hidden" : ""}`}>
+          DASHBOARD
+        </h2>
       </div>
 
       <ul className="sidebar-nav">
@@ -52,7 +50,7 @@ const CustomSidebar = () => {
       </ul>
       <div className="sidebar-footer">
         <button onClick={handleLogout} className="logout-btn">
-          <i className="fas fa-sign-out-alt"></i>
+          <i className="fas fa-sign-out-alt" style={{ marginRight: '10px' }}></i>
           {!isCollapsed && <span> Log Out</span>}
         </button>
       </div>
