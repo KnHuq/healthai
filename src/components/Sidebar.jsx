@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import "./CustomSidebar.css"; // Ensure updated styles are applied
 import { useNavigate } from "react-router-dom";
 
+
 const CustomSidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false); // Manage collapsed state
   const navigate = useNavigate();
@@ -36,17 +37,18 @@ const CustomSidebar = () => {
           </NavLink>
         </li>
         <li>
-          <NavLink to="/admin-auth" activeClassName="active">
-            <i className="fas fa-user-shield"></i>
-            {!isCollapsed && <span> Admin</span>}
+          <NavLink to="/analysis" activeClassName="active">
+            <i class="fa fa-line-chart" aria-hidden="true"></i>
+            {!isCollapsed && <span> Analysis</span>}
           </NavLink>
         </li>
         <li>
-          <NavLink to="/register" activeClassName="active">
-            <i className="fas fa-user-plus"></i>
-            {!isCollapsed && <span> Register</span>}
+          <NavLink to="/textinput" activeClassName="active">
+            <i className="fa fa-file-text" aria-hidden="true"></i>
+            {!isCollapsed && <span> Text Input</span>}
           </NavLink>
         </li>
+        
       </ul>
       <div className="sidebar-footer">
         <button onClick={handleLogout} className="logout-btn">
