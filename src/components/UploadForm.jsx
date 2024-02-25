@@ -29,14 +29,14 @@ const UploadFormSidebar = () => {
   };
 
   return (
-    <MDBRow className="d-flex-justify-content-center align-items-center">
+    <MDBRow className="d-flex text-center-justify-content-center align-items-center vh-100">
       <MDBCol col="12">
         <MDBCard
           className="bg-dark text-white my-5 mx-auto"
           style={{ borderRadius: "1rem", maxWidth: "400px" }}
         >
           <MDBCardBody className="p-5 d-flex flex-column align-items-center mx-auto w-100">
-            <h2 className="fw-bold mb-2 text-uppercase">Upload</h2>
+            <h2 className="fw-bold mb-2 text-uppercase">Analyse</h2>
             <p className="text-white-50 mb-5">
               Please upload your file for processing.
             </p>
@@ -44,7 +44,7 @@ const UploadFormSidebar = () => {
             <MDBInput
               wrapperClass="mb-4 mx-5 w-100"
               labelClass="text-white"
-              label="Upload File"
+              label="Browse File"
               id="fileUpload"
               type="file"
               size="lg"
@@ -60,7 +60,7 @@ const UploadFormSidebar = () => {
               size="lg"
               onClick={uploadFile}
             >
-              Upload
+              Analyse
             </MDBBtn>
           </MDBCardBody>
         </MDBCard>

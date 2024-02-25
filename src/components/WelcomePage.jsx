@@ -6,7 +6,7 @@ import {
 } from "mdb-react-ui-kit";
 import Sidebar from "./Sidebar"; // Ensure this is pointing to your custom Sidebar component
 import UploadFormSidebar from "./UploadForm";
-import LineChatComponent from "./LineChart";
+import LineChartComponent from "./LineChart";
 import BarChatComponent from "./BarChart";
 import SimpleTable from "./SimpleTable";
 import TaskTableComponent from "./TaskTable";
@@ -16,8 +16,8 @@ const WelcomePage = () => {
 
 
   return (
-    <MDBContainer className="hide-scrollbar" >
-      <div style={{ overflowY: 'auto', maxHeight: '100vh', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+    <MDBContainer >
+      <div style={{ overflowY: 'hidden', maxHeight: '100vh', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         <MDBRow className="flex">
           <MDBCol sm="2" className="p-0">
             <Sidebar />
@@ -25,23 +25,23 @@ const WelcomePage = () => {
           <MDBCol md="10" className="p-0">
             <MDBRow>
               <MDBCol md="6" className="p-2">
-                <LineChatComponent />
+                {/*<LineChartComponent />*/}
               </MDBCol>
               <MDBCol md="6" className="p-2">
-                <BarChatComponent />
+                {/*<BarChatComponent />*/}
               </MDBCol>
             </MDBRow>
             <MDBRow className="align-items-center justify-content-center">
-              <MDBCol md="6" className="p-2 d-flex justify-content-center">
+              <MDBCol md="6" className="p-2 text-center d-flex justify-content-center mt-100">
                 <UploadFormSidebar />
               </MDBCol>
             </MDBRow>
             <MDBRow>
               <MDBCol md="6" className="p-2">
-                <SimpleTable />
+                {/*<SimpleTable />*/}
               </MDBCol>
               <MDBCol md="6" className="p-2">
-                <TaskTableComponent />
+                {/*<TaskTableComponent />*/}
               </MDBCol>
             </MDBRow>
           </MDBCol>

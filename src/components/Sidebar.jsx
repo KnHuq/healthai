@@ -38,13 +38,13 @@ const CustomSidebar = () => {
         </li>
         <li>
           <NavLink to="/analysis" activeClassName="active">
-            <i class="fa fa-line-chart" aria-hidden="true"></i>
+            <i class="fa fa-line-chart" aria-hidden="true" style={{ marginRight: '10px' }}></i>
             {!isCollapsed && <span> Analysis</span>}
           </NavLink>
         </li>
         <li>
           <NavLink to="/textinput" activeClassName="active">
-            <i className="fa fa-file-text" aria-hidden="true"></i>
+            <i className="fa fa-file-text" aria-hidden="true" style={{ marginRight: '10px' }}></i>
             {!isCollapsed && <span> Text Input</span>}
           </NavLink>
         </li>
