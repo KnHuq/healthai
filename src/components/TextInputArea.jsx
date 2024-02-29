@@ -1,5 +1,5 @@
 import React from "react";
-import {MDBRow, MDBInput, MDBCard, MDBCardBody } from "mdb-react-ui-kit";
+import {MDBRow, MDBInput, MDBCard, MDBCardBody, MDBTextArea } from "mdb-react-ui-kit";
 
 const TextInputArea = ({ onTextChange }) => {
   return (
@@ -10,17 +10,18 @@ const TextInputArea = ({ onTextChange }) => {
       >
         <MDBCardBody className="p-5 d-flex flex-column align-items-center mx-auto w-100">
           <h2 className="fw-bold mb-2 text-uppercase">Text Input</h2>
-          <p className="text-white-50 mb-5">
+          <p className="text-white-50 mb-3">
             Please enter your text for processing.
           </p>
-          <MDBInput
+          <MDBTextArea
             textarea
             id="textInputArea"
-            rows="4"
-            className="mb-4"
+            rows="7"
+            className="form-control"
             style={{ backgroundColor: "#fff", color: "#000" }}
             onChange={(e) => onTextChange(e.target.value)}
             placeholder="Type something..."
+            contrast
           />
         </MDBCardBody>
       </MDBCard>

@@ -6,12 +6,14 @@ import { useNavigate } from "react-router-dom";
 
 const CustomSidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false); // Manage collapsed state
+  const [navVisible, setNavVisible] = useState(false); // Manage visibility of navigation on mobile
   const navigate = useNavigate();
 
   const handleLogout = () => {
     navigate("/");
   };
 
+  
   return (
     <div
       className={`custom-sidebar ${
@@ -28,6 +30,7 @@ const CustomSidebar = () => {
         </h2>
       </div>
 
+      
       <ul className="sidebar-nav">
         {/* Navigation Links */}
         <li>
@@ -38,21 +41,31 @@ const CustomSidebar = () => {
         </li>
         <li>
           <NavLink to="/analysis" activeClassName="active">
-            <i class="fa fa-line-chart" aria-hidden="true" style={{ marginRight: '10px' }}></i>
+            <i
+              class="fa fa-line-chart"
+              aria-hidden="true"
+              style={{ marginRight: "10px" }}
+            ></i>
             {!isCollapsed && <span> Analysis</span>}
           </NavLink>
         </li>
         <li>
           <NavLink to="/textinput" activeClassName="active">
-            <i className="fa fa-file-text" aria-hidden="true" style={{ marginRight: '10px' }}></i>
+            <i
+              className="fa fa-file-text"
+              aria-hidden="true"
+              style={{ marginRight: "10px" }}
+            ></i>
             {!isCollapsed && <span> Text Input</span>}
           </NavLink>
         </li>
-        
       </ul>
       <div className="sidebar-footer">
         <button onClick={handleLogout} className="logout-btn">
-          <i className="fas fa-sign-out-alt" style={{ marginRight: '10px' }}></i>
+          <i
+            className="fas fa-sign-out-alt"
+            style={{ marginRight: "10px", marginLeft: "10px" }}
+          ></i>
           {!isCollapsed && <span> Log Out</span>}
         </button>
       </div>

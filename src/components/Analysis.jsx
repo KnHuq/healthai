@@ -10,6 +10,7 @@ import LineChartComponent from "./LineChart";
 import BarChatComponent from "./BarChart";
 import SimpleTable from "./SimpleTable";
 import TaskTableComponent from "./TaskTable";
+import MiniDrawer from "./MuiSideBar";
 import "./loginSignupPage.css";
 
 const Analysis = () => {
@@ -20,7 +21,7 @@ const Analysis = () => {
       <div style={{ overflowY: 'auto', maxHeight: '100vh', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         <MDBRow className="flex">
           <MDBCol sm="2" className="p-0">
-            <Sidebar />
+            <MiniDrawer />
           </MDBCol>
           <MDBCol md="10" className="p-0">
             <MDBRow>

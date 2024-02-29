@@ -3,6 +3,7 @@ import { MDBContainer, MDBRow, MDBCol } from "mdb-react-ui-kit";
 import Sidebar from "./Sidebar";
 import TextInputArea from "./TextInputArea"; // Import the TextInputArea component
 import DisplayText from "./DisplayText"; // Import the DisplayText component
+import MiniDrawer from "./MuiSideBar";
 import "./loginSignupPage.css";
 
 const TextDisplayFeaturePage = () => {
@@ -10,17 +11,10 @@ const TextDisplayFeaturePage = () => {
 
   return (
     <MDBContainer>
-      <div
-        style={{
-          overflowY: "hidden",
-          maxHeight: "100vh",
-          scrollbarWidth: "none",
-          msOverflowStyle: "none",
-        }}
-      >
+      <div style={{ overflowY: 'auto', maxHeight: '100vh', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         <MDBRow className="flex">
           <MDBCol sm="2" className="p-0">
-            <Sidebar />
+            <MiniDrawer />
           </MDBCol>
           <MDBCol md="10" className="p-0">
             <MDBRow className="align-items-center justify-content-center mt-100">
