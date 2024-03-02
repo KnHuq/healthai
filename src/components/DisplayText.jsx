@@ -2,6 +2,18 @@ import React from "react";
 import { MDBRow, MDBCard, MDBCardBody } from "mdb-react-ui-kit";
 
 const DisplayText = ({ text }) => {
+    // Define the keywords array
+  const keywords = ["happy", "sad", "angry", "depressed", "delighted"];
+
+  // Function to check if the text contains any of the keywords
+  const containsKeywords = (text) => {
+    const textLower = text.toLowerCase();
+    return keywords.some(keyword => textLower.includes(keyword));
+  };
+
+  // Determine if the text should be displayed based on the keywords
+  const shouldDisplayText = containsKeywords(text);
+
   return (
     <MDBRow className="d-flex-justify-content-center align-items-center mt-100 vh-100">
       <MDBCard
@@ -21,7 +33,11 @@ const DisplayText = ({ text }) => {
               msOverflowStyle: "none",
             }}
           >
-            {text}
+            {shouldDisplayText ? (
+            <h2>{text}</h2>
+          ) : (
+            <h5>Text does not contain specified keywords.</h5> // Or simply return null or any placeholder message
+          )}
           </p>
         </MDBCardBody>
       </MDBCard>
