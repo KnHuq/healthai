@@ -14,18 +14,38 @@ import {
 const UploadFormSidebar = () => {
   const [file, setFile] = useState(null); // State to hold the uploaded file
   const [feedback, setFeedback] = useState(""); // Placeholder for feedback
+  const SERVER_URL = "http://localhost:5000";
 
   const uploadFile = () => {
     if (!file) {
       setFeedback("Please select a file to upload.");
       return;
     }
-    // Example: Upload logic here
-    console.log("Uploading", file);
-    // Here you would typically use fetch or axios to send the file to your server
-    setFeedback("File is being uploaded...");
-    // Simulate an upload
-    setTimeout(() => setFeedback("File uploaded successfully!"), 1500);
+    // Create FormData object
+  const formData = new FormData();
+  formData.append("file", file);
+
+  // Fetch request to send the file to the backend
+  fetch("http://localhost:5000/upload", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("Failed to upload file");
+      }
+      return response.json(); // Assuming backend returns JSON response
+    })
+    .then((data) => {
+      // Handle successful upload response
+      console.log("File uploaded successfully:", data);
+      setFeedback("File uploaded successfully!");
+    })
+    .catch((error) => {
+      // Handle error
+      console.error("Error uploading file:", error.message);
+      setFeedback("Failed to upload file. Please try again later.");
+    });
   };
 
   return (

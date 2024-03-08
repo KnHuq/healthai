@@ -12,8 +12,14 @@ bcrypt = Bcrypt(app)
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "users.db")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+UPLOAD_FOLDER = "uploads"
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
+
 
 db = SQLAlchemy(app)
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
 
 # User Model
 class User(db.Model):
@@ -22,18 +28,22 @@ class User(db.Model):
     password = db.Column(db.String(60), nullable=False)
 
     def set_password(self, password):
-        self.password = bcrypt.generate_password_hash(password).decode('utf-8')
+        self.password = bcrypt.generate_password_hash(password).decode("utf-8")
 
     def check_password(self, password):
         return bcrypt.check_password_hash(self.password, password)
 
+
 # Securely generate and use admin_password_hash
-admin_password = os.environ.get('ADMIN_PASSWORD', 'default_admin_password')  # Fallback to a default if not set
-admin_password_hash = bcrypt.generate_password_hash(admin_password).decode('utf-8')
+admin_password = os.environ.get(
+    "ADMIN_PASSWORD", "default_admin_password"
+)  # Fallback to a default if not set
+admin_password_hash = bcrypt.generate_password_hash(admin_password).decode("utf-8")
 
 # Ensure the database exists
 with app.app_context():
     db.create_all()
+
 
 # Routes
 @app.route("/api/verify-admin", methods=["POST"])
@@ -43,6 +53,7 @@ def verify_admin():
     if bcrypt.check_password_hash(admin_password_hash, admin_password):
         return jsonify({"success": True})
     return jsonify({"success": False}), 401
+
 
 @app.route("/api/register", methods=["POST"])
 def register():
@@ -61,6 +72,7 @@ def register():
 
     return jsonify({"success": True})
 
+
 @app.route("/api/login", methods=["POST"])
 def login():
     data = request.json
@@ -71,6 +83,29 @@ def login():
     if user and user.check_password(password):
         return jsonify({"success": True, "message": "Logged in successfully"})
     return jsonify({"success": False, "message": "Incorrect username or password"}), 401
+
+
+@app.route("/upload", methods=["POST"])
+def upload_file():
+    if "file" not in request.files:
+        return jsonify({"error": "No file part"}), 400
+
+    file = request.files["file"]
+
+    if file.filename == "":
+        return jsonify({"error": "No selected file"}), 400
+
+    if file:
+        filename = file.filename
+        file_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+        file.save(file_path)
+        return (
+            jsonify({"message": "File uploaded successfully", "file_path": file_path}),
+            200,
+        )
+
+    return jsonify({"error": "Failed to upload file"}), 500
+
 
 if __name__ == "__main__":
     app.run(debug=True)

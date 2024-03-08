@@ -4,25 +4,31 @@ import Sidebar from "./Sidebar";
 import TextInputArea from "./TextInputArea"; // Import the TextInputArea component
 import DisplayText from "./DisplayText"; // Import the DisplayText component
 import MiniDrawer from "./MuiSideBar";
+import DraftTextInputArea from "./DraftTextInputArea";
 import "./loginSignupPage.css";
 
 const TextDisplayFeaturePage = () => {
-  const [text, setText] = useState(""); // State to hold the text input
+  const [highlightedText, setHighlightedText] = useState([]);
+
+  const handleHighlightChange = (highlightedWords) => {
+    console.log('Received highlighted words:', highlightedWords);
+    setHighlightedText(highlightedWords);
+  };
 
   return (
-    <MDBContainer>
-      <div style={{ overflowY: 'auto', maxHeight: '100vh', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+    <MDBContainer fluid>
+      <div style={{ overflowY: 'hidden', maxHeight: '100vh', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         <MDBRow className="flex">
           <MDBCol sm="2" className="p-0">
             <MiniDrawer />
           </MDBCol>
           <MDBCol md="10" className="p-0">
-            <MDBRow className="align-items-center justify-content-center mt-100">
-              <MDBCol md="6" className="p-2 d-flex justify-content-center">
-                <TextInputArea onTextChange={setText} />
+            <MDBRow className="align-items-center justify-content-left mt-100 clear-fix">
+              <MDBCol lg="6" className="p-0 d-flex float-left">
+                <DraftTextInputArea onHighlightChange={handleHighlightChange} />
               </MDBCol>
-              <MDBCol md="6" className="p-2 d-flex justify-content-center">
-                <DisplayText text={text} />
+              <MDBCol lg="6" className="p-0 d-flex float-right">
+                <DisplayText highlightedWords={highlightedText} />
               </MDBCol>
             </MDBRow>
           </MDBCol>
