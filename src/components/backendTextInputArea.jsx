@@ -59,7 +59,13 @@ class BackendTextInputArea extends React.Component {
   updateMatches = async () => {
     const text = this.state.editorState.getCurrentContent().getPlainText();
     const matches = await getMatchedWordsFromBackend(text);
-    this.setState({ matches }, this.refreshEditor);
+    const highlightedwords = matches.map((match) =>
+      text.slice(match.start, match.end)
+    ); // Extract words from text based on match indices
+    this.setState({ matches }, () => {
+      this.refreshEditor();
+      this.props.onHighlightUpdate(highlightedwords); // Call the callback with the highlighted words
+    });
   };
 
   /**
@@ -135,7 +141,16 @@ class BackendTextInputArea extends React.Component {
  * Component to render the highlighted portion of text.
  */
 const Highlight = (props) => (
-  <span style={{ backgroundColor: "yellow" }}>{props.children}</span>
+  <span
+    style={{
+      fontWeight: "bold",
+      textDecoration: "underline",
+      backgroundColor: "#2575fc",
+      color: "white",
+    }}
+  >
+    {props.children}
+  </span>
 );
 
 export default BackendTextInputArea;

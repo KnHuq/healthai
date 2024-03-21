@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   MDBBtn,
   MDBRow,
@@ -14,7 +13,7 @@ import {
 const UploadFormSidebar = () => {
   const [file, setFile] = useState(null); // State to hold the uploaded file
   const [feedback, setFeedback] = useState(""); // Placeholder for feedback
-  const SERVER_URL = "http://localhost:5000";
+  const SERVER_URL = "http://localhost:5000/upload";
 
   const uploadFile = () => {
     if (!file) {
@@ -26,7 +25,7 @@ const UploadFormSidebar = () => {
   formData.append("file", file);
 
   // Fetch request to send the file to the backend
-  fetch("http://localhost:5000/upload", {
+  fetch(SERVER_URL, {
     method: "POST",
     body: formData,
   })

@@ -1,8 +1,8 @@
 import React from "react";
 import { MDBRow, MDBCard, MDBCardBody } from "mdb-react-ui-kit";
 
-const DisplayText = ({ highlightedWords }) => {
-  console.log('DisplayText received:', highlightedWords);
+const DisplayText = ({ highlightedwords }) => {
+  console.log('DisplayText received:', highlightedwords);
   return (
     <MDBRow className="d-flex-justify-content-center align-items-center mt-100 vh-100">
       <MDBCard
@@ -13,7 +13,7 @@ const DisplayText = ({ highlightedWords }) => {
           <h2 className="fw-bold mb-2 text-uppercase Text-center">
             Highlighted Text
           </h2>
-          {highlightedWords && highlightedWords.length > 0 ? (
+          {highlightedwords && highlightedwords.length > 0 ? (
             <div
               className="text-light-50 mb-5 p-3"
               style={{
@@ -26,7 +26,7 @@ const DisplayText = ({ highlightedWords }) => {
               }}
             >
               {/* Map through the highlightedWords array and display each word */}
-              {highlightedWords.map((word, index) => (
+              {highlightedwords.map((word, index) => (
                 <span
                   key={index}
                   style={{

@@ -9,16 +9,28 @@ import BackendTextInputArea from "./backendTextInputArea";
 import "./loginSignupPage.css";
 
 const TextDisplayFeaturePage = () => {
-  const [highlightedText, setHighlightedText] = useState([]);
+  //const [highlightedText, setHighlightedText] = useState([]);
+  const [highlightedWords, setHighlightedWords] = useState([]);
 
-  const handleHighlightChange = (highlightedWords) => {
-    console.log('Received highlighted words:', highlightedWords);
-    setHighlightedText(highlightedWords);
+  //const handleHighlightChange = (highlightedWords) => {
+  //console.log('Received highlighted words:', highlightedWords);
+  //setHighlightedText(highlightedWords);
+  // };
+
+  const handleHighlightUpdate = (highlightedwords) => {
+    setHighlightedWords(highlightedwords);
   };
 
   return (
     <MDBContainer fluid>
-      <div style={{ overflowY: 'hidden', maxHeight: '100vh', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+      <div
+        style={{
+          overflowY: "hidden",
+          maxHeight: "100vh",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+        }}
+      >
         <MDBRow className="flex">
           <MDBCol sm="2" className="p-0">
             <MiniDrawer />
@@ -26,10 +38,16 @@ const TextDisplayFeaturePage = () => {
           <MDBCol md="10" className="p-0">
             <MDBRow className="align-items-center justify-content-left mt-100 clear-fix">
               <MDBCol lg="6" className="p-0 d-flex float-left">
-                <BackendTextInputArea onHighlightChange={handleHighlightChange} />
+                <BackendTextInputArea
+                  //onHighlightChange={handleHighlightChange}
+                  onHighlightUpdate={handleHighlightUpdate}
+                />
               </MDBCol>
               <MDBCol lg="6" className="p-0 d-flex float-right">
-                <DisplayText highlightedWords={highlightedText} />
+                <DisplayText 
+                //highlightedWords={highlightedText}
+                highlightedwords={highlightedWords} 
+                />
               </MDBCol>
             </MDBRow>
           </MDBCol>

@@ -3,6 +3,8 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+import re
+
 
 app = Flask(__name__)
 CORS(app)
@@ -19,6 +21,7 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 db = SQLAlchemy(app)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+KEYWORDS = ['happy', 'angry', 'sad', 'depressed', 'delighted']
 
 
 # User Model
@@ -106,6 +109,17 @@ def upload_file():
 
     return jsonify({"error": "Failed to upload file"}), 500
 
+
+@app.route('/match-words', methods=['POST'])
+def match_words():
+    data = request.json
+    text = data.get('text', '')
+    matches = []
+    for keyword in KEYWORDS:
+        start = text.find(keyword)
+        if start != -1:
+            matches.append({'start': start, 'end': start + len(keyword)})
+    return jsonify({'matches': matches})
 
 if __name__ == "__main__":
     app.run(debug=True)
