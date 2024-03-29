@@ -13,7 +13,13 @@ import {
 const UploadFormSidebar = () => {
   const [file, setFile] = useState(null); // State to hold the uploaded file
   const [feedback, setFeedback] = useState(""); // Placeholder for feedback
+  const [feedbackType, setFeedbackType] = useState(""); // "success" or "error"
+  const [inputKey, setInputKey] = useState(Date.now()); // State to manage input key
   const SERVER_URL = "http://localhost:5000/upload";
+
+
+  const feedbackStyle =
+    feedbackType === "success" ? "text-success" : "text-danger";
 
   const uploadFile = () => {
     if (!file) {
@@ -39,11 +45,15 @@ const UploadFormSidebar = () => {
       // Handle successful upload response
       console.log("File uploaded successfully:", data);
       setFeedback("File uploaded successfully!");
+      setFeedbackType("success");
+      setInputKey(Date.now()); // Reset the file input by changing its ke
+      setFile(null);
     })
     .catch((error) => {
       // Handle error
       console.error("Error uploading file:", error.message);
       setFeedback("Failed to upload file. Please try again later.");
+      setFeedbackType("error");
     });
   };
 
@@ -59,8 +69,11 @@ const UploadFormSidebar = () => {
             <p className="text-white-50 mb-5">
               Please upload your file for processing.
             </p>
-            {feedback && <div className="text-danger mb-3">{feedback}</div>}
+            {feedback && (
+                <div className={`mb-3 ${feedbackStyle}`}>{feedback}</div>
+              )}
             <MDBInput
+              key={inputKey}
               wrapperClass="mb-4 mx-5 w-100"
               labelClass="text-white"
               label="Browse File"

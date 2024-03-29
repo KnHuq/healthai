@@ -165,7 +165,7 @@ export default function MiniDrawer() {
               <ListItemIcon>
                 <TextFieldsIcon />
               </ListItemIcon>
-              <ListItemText primary="Text Input" />
+              <ListItemText primary="Text" />
             </ListItemButton>
           </ListItem>
         </List>

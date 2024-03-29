@@ -24,7 +24,7 @@ const TaskTableComponent = () => {
           <MDBDropdownToggle tag="a" className="btn-icon" color="link">
             <i className="tim-icons icon-settings-gear-63" />
           </MDBDropdownToggle>
-          <MDBDropdownMenu>
+          <MDBDropdownMenu className="bg-dark text-white">
             <MDBDropdownItem href="#!" onClick={(e) => e.preventDefault()}>
               Action
             </MDBDropdownItem>
@@ -59,7 +59,7 @@ const TaskTableComponent = () => {
                       className: "btn btn-link btn-icon",
                     }}
                   >
-                    <i className="tim-icons icon-pencil" />
+                    <i class="fa fa-pencil"></i>
                   </MDBTooltip>
                 </td>
               </tr>

@@ -8,6 +8,7 @@ import DraftTextInputArea from "./DraftTextInputArea";
 import BackendTextInputArea from "./backendTextInputArea";
 import "./loginSignupPage.css";
 
+
 const TextDisplayFeaturePage = () => {
   //const [highlightedText, setHighlightedText] = useState([]);
   const [highlightedWords, setHighlightedWords] = useState([]);
@@ -25,7 +26,7 @@ const TextDisplayFeaturePage = () => {
     <MDBContainer fluid>
       <div
         style={{
-          overflowY: "hidden",
+          overflowY: "auto",
           maxHeight: "100vh",
           scrollbarWidth: "none",
           msOverflowStyle: "none",
@@ -35,15 +36,15 @@ const TextDisplayFeaturePage = () => {
           <MDBCol sm="2" className="p-0">
             <MiniDrawer />
           </MDBCol>
-          <MDBCol md="10" className="p-0">
-            <MDBRow className="align-items-center justify-content-left mt-100 clear-fix">
-              <MDBCol lg="6" className="p-0 d-flex float-left">
+          <MDBCol sm='10' md="10" lg='10' className="p-0">
+            <MDBRow className="align-items-center justify-content-left mt-100 ">
+              <MDBCol sm="6" md='6' lg='6' className="p-0 d-flex ">
                 <BackendTextInputArea
                   //onHighlightChange={handleHighlightChange}
                   onHighlightUpdate={handleHighlightUpdate}
                 />
               </MDBCol>
-              <MDBCol lg="6" className="p-0 d-flex float-right">
+              <MDBCol sm="6" className="p-0 d-flex ">
                 <DisplayText 
                 //highlightedWords={highlightedText}
                 highlightedwords={highlightedWords} 

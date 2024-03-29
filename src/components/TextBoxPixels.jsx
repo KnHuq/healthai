@@ -1,6 +1,6 @@
 import React from "react";
 import { Editor, EditorState, CompositeDecorator } from "draft-js";
-import { MDBCard, MDBCardBody, MDBRow } from "mdb-react-ui-kit";
+import { MDBCard, MDBCardBody } from "mdb-react-ui-kit";
 import "draft-js/dist/Draft.css";
 import axios from "axios"; // Ensure axios is installed for HTTP requests
 
@@ -25,7 +25,7 @@ const getMatchedWordsFromBackend = async (text) => {
 /**
  * React component for text input with highlighting of words matched by a backend.
  */
-class BackendTextInputArea extends React.Component {
+class Textbox extends React.Component {
   constructor(props) {
     super(props);
 
@@ -96,50 +96,43 @@ class BackendTextInputArea extends React.Component {
 
   render() {
     return (
-      <MDBRow className="d-flex-justify-content-center align-items-center mt-100 vh-100">
-        <MDBCard
-          className="bg-dark text-white my-5 mx-0 "
-          style={{
-            minWidth: "42.90vw",
-            //minWidth: "42.90vw",
-            //minWidth: "785px",
-            minHeight: "47.80vh",
-            //maxHeight: "400px",
-            transform: "translateX(-40px)",
-            borderRadius: "1rem",
-          }}
-        >
-          <MDBCardBody className="d-flex flex-column align-items-center mx-auto w-100">
-            <h2 className="fw-bold mb-2 text-uppercase">Text Box</h2>
-            <p className="text-white-50 mb-3">
-              Please enter your text for processing.
-            </p>
-            <div
-              style={{
-                backgroundColor: "#fff",
-                color: "#000",
-                minwidth: "20rem",
-                maxWidth: '45rem',
-                minHeight: "20rem",
-                //padding: "6px 12px",
-                //borderRadius: "4px",
-                //border: "1px solid #ced4da",
-                overflowY: "auto",
-              }}
-              className="form-control"
-            >
-              {/* onChange updated to use the editor state directly */}
-              <Editor
-                editorState={this.state.editorState}
-                onChange={(editorState) =>
-                  this.setState({ editorState }, this.updateMatches)
-                }
-                placeholder="Type something..."
-              />
-            </div>
-          </MDBCardBody>
-        </MDBCard>
-      </MDBRow>
+      <MDBCard
+        className="bg-dark text-white my-5 mx-0 "
+        style={{
+          minWidth: "785px",
+          minHeight: "400px",
+          maxHeight: "400px",
+          transform: "translateX(-40px)",
+        }}
+      >
+        <MDBCardBody className="d-flex flex-column align-items-center mx-auto w-100">
+          <h2 className="fw-bold mb-2 text-uppercase">Text Box</h2>
+          <p className="text-white-50 mb-3">
+            Please enter your text for processing.
+          </p>
+          <div
+            style={{
+              backgroundColor: "#fff",
+              color: "#000",
+              width: "100%",
+              minHeight: "17rem",
+              padding: "6px 12px",
+              borderRadius: "4px",
+              border: "1px solid #ced4da",
+              overflowY: "auto",
+            }}
+            className="form-control"
+          >
+            {/* onChange updated to use the editor state directly */}
+            <Editor
+              editorState={this.state.editorState}
+              onChange={(editorState) =>
+                this.setState({ editorState }, this.updateMatches)
+              }
+            />
+          </div>
+        </MDBCardBody>
+      </MDBCard>
     );
   }
 }
@@ -160,4 +153,4 @@ const Highlight = (props) => (
   </span>
 );
 
-export default BackendTextInputArea;
+export default Textbox;
