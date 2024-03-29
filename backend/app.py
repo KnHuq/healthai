@@ -21,7 +21,12 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 db = SQLAlchemy(app)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-KEYWORDS = ['happy', 'angry', 'sad', 'depressed', 'delighted']
+KEYWORDS = ["goal", "diagnosis", "differential", "gap", "driver", "risks", "foreseeable", "available_resources",
+            "present", "histor", "symptom", "admission-to", "concerns", "current_episode", "experiencing", "arrived",
+            "percipit", "context", "trigger", "relapse", "instigate", "induced", "exacerbated",
+            "perpetuat", "contribute", "maintain", "lasted", "ongoing", "regular_use",
+            "protect","strength","potential","compliant","coping","hobbies","improved",
+            "improvement","loving","relationship","friendship","connection","supported","supportive"]
 
 
 # User Model
@@ -110,6 +115,7 @@ def upload_file():
     return jsonify({"error": "Failed to upload file"}), 500
 
 
+"""
 @app.route('/match-words', methods=['POST'])
 def match_words():
     data = request.json
@@ -120,6 +126,28 @@ def match_words():
         if start != -1:
             matches.append({'start': start, 'end': start + len(keyword)})
     return jsonify({'matches': matches})
+
+  """
+
+@app.route('/match-words', methods=['POST'])
+def match_words():
+    data = request.json
+    text = data.get("text", "")
+    matches = []
+    for keyword in KEYWORDS:
+        start = 0  # Start from the beginning of the text
+        while start < len(text):
+            # Find the keyword starting from 'start'
+            start = text.find(keyword, start)
+            if start == -1:  # No more occurrences found
+                break
+            # Add the match with the current start and end indices
+            matches.append({"start": start, "end": start + len(keyword)})
+            start += len(
+                keyword
+            )  # Move past the current match to find subsequent matches
+    return jsonify({"matches": matches})
+
 
 if __name__ == "__main__":
     app.run(debug=True)
