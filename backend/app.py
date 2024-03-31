@@ -21,12 +21,108 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 db = SQLAlchemy(app)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
-KEYWORDS = ["goal", "diagnosis", "differential", "gap", "driver", "risks", "foreseeable", "available_resources",
-            "present", "histor", "symptom", "admission-to", "concerns", "current_episode", "experiencing", "arrived",
-            "percipit", "context", "trigger", "relapse", "instigate", "induced", "exacerbated",
-            "perpetuat", "contribute", "maintain", "lasted", "ongoing", "regular_use",
-            "protect","strength","potential","compliant","coping","hobbies","improved",
-            "improvement","loving","relationship","friendship","connection","supported","supportive"]
+KEYWORDS = [
+    "goal",
+    "diagnosis",
+    "differential",
+    "gap",
+    "driver",
+    "risks",
+    "foreseeable",
+    "available_resources",
+    "present",
+    "history",
+    "symptom",
+    "admission-to",
+    "concerns",
+    "current_episode",
+    "experiencing",
+    "arrived",
+    "percipit",
+    "context",
+    "trigger",
+    "relapse",
+    "instigate",
+    "induced",
+    "exacerbated",
+    "perpetuat",
+    "contribute",
+    "maintain",
+    "lasted",
+    "ongoing",
+    "regular_use",
+    "protect",
+    "strength",
+    "potential",
+    "compliant",
+    "coping",
+    "hobbies",
+    "improved",
+    "improvement",
+    "loving",
+    "relationship",
+    "friendship",
+    "connection",
+    "supported",
+    "supportive",
+]
+
+# Your dictionary and word_to_category mapping here
+Ps_dictionary = {
+    "integrated_formulations": [
+        "goal",
+        "diagnosis",
+        "differential",
+        "gap",
+        "driver",
+        "risks",
+        "foreseeable",
+        "available_resources",
+    ],
+    "presentation_factors": [
+        "present",
+        "history",
+        "symptom",
+        "admission-to",
+        "concerns",
+        "current_episode",
+        "experiencing",
+        "arrived",
+    ],
+    "precipitating_factors": [
+        "percipit",
+        "context",
+        "trigger",
+        "relapse",
+        "instigate",
+        "induced",
+        "exacerbated",
+    ],
+    "perpetuating_factors": [
+        "perpetuat",
+        "contribute",
+        "maintain",
+        "lasted",
+        "ongoing",
+        "regular_use",
+    ],
+    "protective_factors": [
+        "protect",
+        "strength",
+        "potential",
+        "compliant",
+        "coping",
+        "hobbies",
+        "improved",
+        "improvement",
+        "loving",
+        "relationship",
+        "friendship",
+        "connection",
+        "supported",
+        "supportive",
+    ],
+}
 
 
 # User Model
@@ -42,7 +138,7 @@ class User(db.Model):
         return bcrypt.check_password_hash(self.password, password)
 
 
-# Securely generate and use admin_password_hash
+# Securely generate and use admin_password_hash,
 admin_password = os.environ.get(
     "ADMIN_PASSWORD", "default_admin_password"
 )  # Fallback to a default if not set
@@ -115,24 +211,10 @@ def upload_file():
     return jsonify({"error": "Failed to upload file"}), 500
 
 
-"""
-@app.route('/match-words', methods=['POST'])
+@app.route("/match-words", methods=["POST"])
 def match_words():
     data = request.json
-    text = data.get('text', '')
-    matches = []
-    for keyword in KEYWORDS:
-        start = text.find(keyword)
-        if start != -1:
-            matches.append({'start': start, 'end': start + len(keyword)})
-    return jsonify({'matches': matches})
-
-  """
-
-@app.route('/match-words', methods=['POST'])
-def match_words():
-    data = request.json
-    text = data.get("text", "")
+    text = data.get("text", "").lower().strip()
     matches = []
     for keyword in KEYWORDS:
         start = 0  # Start from the beginning of the text
@@ -147,6 +229,38 @@ def match_words():
                 keyword
             )  # Move past the current match to find subsequent matches
     return jsonify({"matches": matches})
+
+
+"""function to match the words to dictionary"""
+
+word_to_category = {}
+for k, v in Ps_dictionary.items():
+    for w in v:
+        word_to_category[w.lower().strip()] = k
+
+
+def get_category_from_word(word: str) -> str:
+    """
+    This will find the category of the word from the Ps dictionary
+    """
+    word = word.lower().strip()
+    for key_word, category in word_to_category.items():
+        if key_word in word:
+            return category
+    return "Unknown"  # Return "Unknown" instead of None for better handling in the frontend
+
+
+@app.route("/category", methods=["GET"])
+def category():
+    """
+    This will find the category of the word from the Ps dictionary
+    """
+    word = request.args.get("word", "")
+    if word:
+        category = get_category_from_word(word)
+        return jsonify({"category": category})
+    else:
+        return jsonify({"error": "No word provided"}), 400
 
 
 if __name__ == "__main__":

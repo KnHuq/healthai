@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   MDBBtn,
   MDBRow,
@@ -15,6 +16,7 @@ const UploadFormSidebar = () => {
   const [feedback, setFeedback] = useState(""); // Placeholder for feedback
   const [feedbackType, setFeedbackType] = useState(""); // "success" or "error"
   const [inputKey, setInputKey] = useState(Date.now()); // State to manage input key
+  const navigate = useNavigate();
   const SERVER_URL = "http://localhost:5000/upload";
 
 
@@ -48,6 +50,7 @@ const UploadFormSidebar = () => {
       setFeedbackType("success");
       setInputKey(Date.now()); // Reset the file input by changing its ke
       setFile(null);
+      navigate('/analysis')
     })
     .catch((error) => {
       // Handle error

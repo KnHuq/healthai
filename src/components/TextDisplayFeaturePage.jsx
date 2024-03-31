@@ -6,6 +6,7 @@ import DisplayText from "./DisplayText"; // Import the DisplayText component
 import MiniDrawer from "./MuiSideBar";
 import DraftTextInputArea from "./DraftTextInputArea";
 import BackendTextInputArea from "./backendTextInputArea";
+import DisplayTextTable from "./DisplayTextTable";
 import "./loginSignupPage.css";
 
 
@@ -37,7 +38,7 @@ const TextDisplayFeaturePage = () => {
             <MiniDrawer />
           </MDBCol>
           <MDBCol sm='10' md="10" lg='10' className="p-0">
-            <MDBRow className="align-items-center justify-content-left mt-100 ">
+            <MDBRow className="align-items-center justify-content-left mt-100 vh-100 ">
               <MDBCol sm="6" md='6' lg='6' className="p-0 d-flex ">
                 <BackendTextInputArea
                   //onHighlightChange={handleHighlightChange}
@@ -45,7 +46,7 @@ const TextDisplayFeaturePage = () => {
                 />
               </MDBCol>
               <MDBCol sm="6" className="p-0 d-flex ">
-                <DisplayText 
+                <DisplayTextTable 
                 //highlightedWords={highlightedText}
                 highlightedwords={highlightedWords} 
                 />
