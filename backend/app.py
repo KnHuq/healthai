@@ -253,7 +253,9 @@ def get_category_from_word(word: str) -> str:
 @app.route("/category", methods=["GET"])
 def category():
     """
-    This will find the category of the word from the Ps dictionary
+    This will recieve the word from frontend
+    and call the function to find the category
+    of the word from the Ps dictionary
     """
     word = request.args.get("word", "")
     if word:
@@ -261,6 +263,34 @@ def category():
         return jsonify({"category": category})
     else:
         return jsonify({"error": "No word provided"}), 400
+
+
+@app.route("/api/linechart_data")
+def get_linechart_data():
+    data = [
+        {"name": "Page A", "uv": 4000, "pv": 2400, "amt": 2400},
+        {"name": "Page B", "uv": 3000, "pv": 1398, "amt": 2210},
+        {"name": "Page C", "uv": 2000, "pv": 9800, "amt": 2290},
+        {"name": "Page D", "uv": 2780, "pv": 3908, "amt": 2000},
+        {"name": "Page E", "uv": 1890, "pv": 4800, "amt": 2181},
+        {"name": "Page F", "uv": 2390, "pv": 3800, "amt": 2500},
+        {"name": "Page G", "uv": 3490, "pv": 4300, "amt": 2100},
+    ]
+    return jsonify(data)
+
+
+@app.route("/api/barchart_data")
+def get_barchart_data():
+    data = [
+        {"name": "Page A", "uv": 4000, "pv": 2400, "amt": 2400},
+        {"name": "Page B", "uv": 3000, "pv": 1398, "amt": 2210},
+        {"name": "Page C", "uv": 2000, "pv": 9800, "amt": 2290},
+        {"name": "Page D", "uv": 2780, "pv": 3908, "amt": 2000},
+        {"name": "Page E", "uv": 1890, "pv": 4800, "amt": 2181},
+        {"name": "Page F", "uv": 2390, "pv": 3800, "amt": 2500},
+        {"name": "Page G", "uv": 3490, "pv": 4300, "amt": 2100},
+    ]
+    return jsonify(data)
 
 
 if __name__ == "__main__":
