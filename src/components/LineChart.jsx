@@ -21,18 +21,28 @@ import { MDBCard, MDBCardBody,} from "mdb-react-ui-kit";
   { name: "Page G", uv: 3490, pv: 4300, amt: 2100 },
 ];*/
 
-const LineChartComponent = () => {
-  const [data, setData] = useState([]);
+const LineChartComponent = ({ selectedDate, linedata}) => {
+  //const [data, setData] = useState([]);
+  
 
-  useEffect(() => {
+  /*useEffect(() => {
     const fetchData = async () => {
-      const response = await fetch('http://localhost:5000/api/linechart_data');
-      const data = await response.json();
-      setData(data);
+      const url = `http://localhost:5000/api/linechart_data${selectedDate ? `?date=${selectedDate.toISOString().split('T')[0]}` : ''}`;
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const jsonData = await response.json();
+        setData(jsonData);
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+        // Optionally set some state here to show an error message
+      }
     };
 
     fetchData();
-  }, []);
+  }, [selectedDate]);*/
 
   return (
     <MDBCard
@@ -43,7 +53,7 @@ const LineChartComponent = () => {
         <h4 className="text-center mb-4">Data Visualization</h4>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart
-            data={data}
+            data={linedata}
             
           >
             <CartesianGrid strokeDasharray="3 3" />

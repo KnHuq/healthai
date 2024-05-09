@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   MDBContainer,
   MDBRow,
@@ -12,9 +12,45 @@ import SimpleTable from "./SimpleTable";
 import TaskTableComponent from "./TaskTable";
 import MiniDrawer from "./MuiSideBar";
 import "./loginSignupPage.css";
+import BasicDatePicker from "./muiDatePicker";
+
 
 const Analysis = () => {
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [linechartData, setLineChartData] = useState([]); // State to hold fetched data
+  const [barchartData, setBarChartData] = useState([]);
 
+  const fetchLinechartData = async (date) => {
+    console.log('Fetching data for:', date);  // Verify this gets called
+    const formattedDate = date.toISOString().split('T')[0]; // Format date to 'YYYY-MM-DD'
+    try {
+      const response = await fetch(`http://localhost:5000/api/linechart_data?date=${formattedDate}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const jsonData = await response.json();
+      setLineChartData(jsonData); // Set fetched data to state
+      console.log('data recieved in analysis component')
+    } catch (error) {
+      console.error('There has been a problem with your fetch operation:', error);
+    }
+  };
+
+  const fetchBarchartData = async (date) => {
+    console.log('Fetching bar data for:', date);  // Verify this gets called
+    const formattedDate = date.toISOString().split('T')[0]; // Format date to 'YYYY-MM-DD'
+    try {
+      const response = await fetch(`http://localhost:5000/api/barchart_data?date=${formattedDate}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const jsonData = await response.json();
+      setBarChartData(jsonData); // Set fetched data to state
+      console.log('bar data recieved in analysis component')
+    } catch (error) {
+      console.error('There has been a problem with your fetch operation:', error);
+    }
+  };
 
   return (
     <MDBContainer >
@@ -26,17 +62,25 @@ const Analysis = () => {
           <MDBCol md="10" className="p-0">
             <MDBRow>
               <MDBCol md="6" className="p-2">
-                <LineChartComponent />
+                <LineChartComponent linedata={linechartData} />
               </MDBCol>
               <MDBCol md="6" className="p-2">
-                <BarChatComponent />
+                <BarChatComponent bardata={barchartData} />
               </MDBCol>
             </MDBRow>
-           {/* <MDBRow className="align-items-center justify-content-center">
+            <MDBRow className="align-items-center justify-content-center">
               <MDBCol md="6" className="p-2 d-flex justify-content-center ">
-                <UploadFormSidebar />
+              <BasicDatePicker 
+                  selected={selectedDate}
+                  onChange={(date) => {
+                    setSelectedDate(date);
+                    fetchLinechartData(date); // Trigger data fetch on date change
+                    fetchBarchartData(date);
+                  }}
+                />
+
               </MDBCol>
-            </MDBRow>*/}
+            </MDBRow>
             <MDBRow>
               <MDBCol md="6" className="p-2">
                 <SimpleTable />

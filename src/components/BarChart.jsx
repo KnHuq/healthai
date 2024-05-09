@@ -13,10 +13,11 @@ import { MDBCard, MDBCardBody} from "mdb-react-ui-kit";
   { name: "Page G", uv: 3490, pv: 4300, amt: 2100 },
 ];*/
 
-const BarChatComponent = () => {
-  const [data, setData] = useState([]);
+const BarChatComponent = ({selectedDate, bardata}) => {
+  
+  //const [data, setData] = useState([]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     const fetchData = async () => {
       const response = await fetch('http://localhost:5000/api/barchart_data');
       const data = await response.json();
@@ -24,7 +25,7 @@ const BarChatComponent = () => {
     };
 
     fetchData();
-  }, []);
+  }, []);*/
 
     return (
       <MDBCard
@@ -37,9 +38,11 @@ const BarChatComponent = () => {
         <BarChart
           width={500}
           height={300}
-          data={data}
+          data={bardata}
+          
          
         >
+          console.log('Fetching data for:', date);
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
           <YAxis />

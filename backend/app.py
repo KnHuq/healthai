@@ -4,7 +4,9 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 import re
-
+from datetime import datetime, timedelta, date
+import random
+import logging
 
 app = Flask(__name__)
 CORS(app)
@@ -13,6 +15,10 @@ bcrypt = Bcrypt(app)
 # Configuration
 basedir = os.path.abspath(os.path.dirname(__file__))
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "users.db")
+app.config['SQLALCHEMY_BINDS'] = {
+    'linechart_db': 'sqlite:///linechart_data.db',   # New database for this specific purpose
+    'barchart_db': 'sqlite:///barchart_data.db' 
+}
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 UPLOAD_FOLDER = "uploads"
 if not os.path.exists(UPLOAD_FOLDER):
@@ -149,6 +155,100 @@ with app.app_context():
     db.create_all()
 
 
+
+class Linechart_DataPoint(db.Model):
+    __bind_key__ = 'linechart_db'
+    date = db.Column(db.Date, default=date.today, index=True) 
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    uv = db.Column(db.Integer, nullable=False)
+    pv = db.Column(db.Integer, nullable=False)
+    amt = db.Column(db.Integer, nullable=False)
+
+
+class Barchart_DataPoint(db.Model):
+    __bind_key__ = 'barchart_db'
+    date = db.Column(db.Date, default=date.today, index=True) 
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    uv = db.Column(db.Integer, nullable=False)
+    pv = db.Column(db.Integer, nullable=False)
+    amt = db.Column(db.Integer, nullable=False)    
+
+
+
+def create_barchart_tables():
+    # Explicitly creating tables for a specific bind
+    engine = db.get_engine(app, bind='barchart_db')
+    Barchart_DataPoint.metadata.create_all(engine)
+    populate_Barchart_db()
+
+def create_linechart_tables():
+    # Explicitly creating tables for a specific bind
+    engine = db.get_engine(app, bind='linechart_db')
+    Linechart_DataPoint.metadata.create_all(engine)
+    populate_linechart_db()    
+
+'''def populate_db():
+    data = [
+        DataPoint(name="Page A", uv=4000, pv=2400, amt=2400),
+        DataPoint(name="Page B", uv=3000, pv=1398, amt=2210),
+        DataPoint(name="Page C", uv=2000, pv=9800, amt=2290),
+        DataPoint(name="Page D", uv=2780, pv=3908, amt=2000),
+        DataPoint(name="Page E", uv=1890, pv=4800, amt=2181),
+        DataPoint(name="Page F", uv=2390, pv=3800, amt=2500),
+        DataPoint(name="Page G", uv=3490, pv=4300, amt=2100),
+    ]
+    db.session.bulk_save_objects(data)
+    db.session.commit()'''
+
+
+def populate_linechart_db():
+    start_date = datetime(2023, 1, 1)  # Start date of the data generation period
+    end_date = datetime(2024, 5, 9)  # End date
+    delta = timedelta(days=1)  # Difference of one day
+    pages = ["Page A", "Page B", "Page C", "Page D", "Page E", "Page F", "Page G"]
+    data = []
+
+    current_date = start_date
+    while current_date <= end_date:
+        for page in pages:
+            data.append(Linechart_DataPoint(
+                name=page,
+                uv=random.randint(1000, 5000),  # Random UV between 1000 and 5000
+                pv=random.randint(1000, 5000),  # Random PV similarly
+                amt=random.randint(1000, 5000),  # Random AMT
+                date=current_date
+            ))
+        current_date += delta
+
+    db.session.bulk_save_objects(data)
+    db.session.commit()
+
+
+def populate_Barchart_db():
+    start_date = datetime(2023, 1, 1)  # Start date of the data generation period
+    end_date = datetime(2024, 5, 9)  # End date
+    delta = timedelta(days=1)  # Difference of one day
+    pages = ["Page A", "Page B", "Page C", "Page D", "Page E", "Page F", "Page G"]
+    data = []
+
+    current_date = start_date
+    while current_date <= end_date:
+        for page in pages:
+            data.append(Barchart_DataPoint(
+                name=page,
+                uv=random.randint(1000, 5000),  # Random UV between 1000 and 5000
+                pv=random.randint(1000, 5000),  # Random PV similarly
+                amt=random.randint(1000, 5000),  # Random AMT
+                date=current_date
+            ))
+        current_date += delta
+
+    db.session.bulk_save_objects(data)
+    db.session.commit()
+
+
 # Routes
 @app.route("/api/verify-admin", methods=["POST"])
 def verify_admin():
@@ -263,9 +363,81 @@ def category():
         return jsonify({"category": category})
     else:
         return jsonify({"error": "No word provided"}), 400
-
-
+'''
 @app.route("/api/linechart_data")
+def get_linechart_data():
+    data_points = DataPoint.query.all()
+    result = [
+        {"name": dp.name, "uv": dp.uv, "pv": dp.pv, "amt": dp.amt}
+        for dp in data_points
+    ]
+    return jsonify(result)
+'''
+@app.route("/api/linechart_data")
+def get_linechart_data():
+    logging.info("Received request for /api/linechart_data")
+    # Optional: Get date from query parameters, format should be 'YYYY-MM-DD'
+    query_date = request.args.get('date')
+    
+    if query_date:
+        try:
+            print(f"Attempting to parse date: {query_date}")
+            specific_date = datetime.strptime(query_date, '%Y-%m-%d').date()
+            print('specific date',specific_date)
+            data_points = Linechart_DataPoint.query.filter(Linechart_DataPoint.date == specific_date).all()
+            print('data_points',data_points)
+        except ValueError:
+            print("Date parsing failed due to ValueError")
+            return jsonify({'error': 'Invalid date format, please use YYYY-MM-DD'}), 400
+    else:
+        # Find the latest date in the database if no date is provided
+        latest_date = db.session.query(db.func.max(Linechart_DataPoint.date)).scalar()
+        data_points = Linechart_DataPoint.query.filter(Linechart_DataPoint.date == latest_date).all()
+
+    result = [
+        {"name": dp.name, "uv": dp.uv, "pv": dp.pv, "amt": dp.amt}
+        for dp in data_points
+    ]
+    print('result',result)
+    return jsonify(result)
+
+
+
+
+@app.route("/api/barchart_data")
+def get_barchart_data():
+    logging.info("Received request for /api/linechart_data")
+    # Optional: Get date from query parameters, format should be 'YYYY-MM-DD'
+    query_date = request.args.get('date')
+    
+    if query_date:
+        try:
+            print(f"Attempting to parse date for bar chart: {query_date}")
+            specific_date = datetime.strptime(query_date, '%Y-%m-%d').date()
+            print('specific date for bar chart',specific_date)
+            data_points = Barchart_DataPoint.query.filter(Barchart_DataPoint.date == specific_date).all()
+            print('data_points',data_points)
+        except ValueError:
+            print("Date parsing failed due to ValueError")
+            return jsonify({'error': 'Invalid date format, please use YYYY-MM-DD'}), 400
+    else:
+        # Find the latest date in the database if no date is provided
+        latest_date = db.session.query(db.func.max(Barchart_DataPoint.date)).scalar()
+        data_points = Barchart_DataPoint.query.filter(Barchart_DataPoint.date == latest_date).all()
+
+    result = [
+        {"name": dp.name, "uv": dp.uv, "pv": dp.pv}
+        for dp in data_points
+    ]
+    print(' bar chart result',result)
+    return jsonify(result)
+
+
+
+
+
+
+'''@app.route("/api/linechart_data")
 def get_linechart_data():
     data = [
         {"name": "Page A", "uv": 4000, "pv": 2400, "amt": 2400},
@@ -276,10 +448,10 @@ def get_linechart_data():
         {"name": "Page F", "uv": 2390, "pv": 3800, "amt": 2500},
         {"name": "Page G", "uv": 3490, "pv": 4300, "amt": 2100},
     ]
-    return jsonify(data)
+    return jsonify(data)'''
 
 
-@app.route("/api/barchart_data")
+'''@app.route("/api/barchart_data")
 def get_barchart_data():
     data = [
         {"name": "Page A", "uv": 4000, "pv": 2400, "amt": 2400},
@@ -290,8 +462,27 @@ def get_barchart_data():
         {"name": "Page F", "uv": 2390, "pv": 3800, "amt": 2500},
         {"name": "Page G", "uv": 3490, "pv": 4300, "amt": 2100},
     ]
-    return jsonify(data)
+    return jsonify(data)'''
+
+'''def populate_db():
+    data = [
+        DataPoint(name="Page A", uv=4000, pv=2400, amt=2400),
+        DataPoint(name="Page B", uv=3000, pv=1398, amt=2210),
+        DataPoint(name="Page C", uv=2000, pv=9800, amt=2290),
+        DataPoint(name="Page D", uv=2780, pv=3908, amt=2000),
+        DataPoint(name="Page E", uv=1890, pv=4800, amt=2181),
+        DataPoint(name="Page F", uv=2390, pv=3800, amt=2500),
+        DataPoint(name="Page G", uv=3490, pv=4300, amt=2100),
+    ]
+    db.session.bulk_save_objects(data)
+    db.session.commit()'''
+
+# Uncomment the next line to run the population script once
+#populate_db()
 
 
 if __name__ == "__main__":
+    with app.app_context():
+        create_linechart_tables()
+        create_barchart_tables()
     app.run(debug=True)
