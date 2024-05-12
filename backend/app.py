@@ -17,7 +17,8 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(basedir, "users.db")
 app.config['SQLALCHEMY_BINDS'] = {
     'linechart_db': 'sqlite:///linechart_data.db',   # New database for this specific purpose
-    'barchart_db': 'sqlite:///barchart_data.db' 
+    'barchart_db': 'sqlite:///barchart_data.db',
+    'simpletable_db': 'sqlite:///simpletable_data.db'  
 }
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 UPLOAD_FOLDER = "uploads"
@@ -173,7 +174,27 @@ class Barchart_DataPoint(db.Model):
     name = db.Column(db.String(50), nullable=False)
     uv = db.Column(db.Integer, nullable=False)
     pv = db.Column(db.Integer, nullable=False)
+    amt = db.Column(db.Integer, nullable=False)
+
+
+
+
+class Simpletable_DataPoint(db.Model):
+    __bind_key__ = 'simpletable_db'
+    date = db.Column(db.Date, default=date.today, index=True) 
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    uv = db.Column(db.Integer, nullable=False)
+    pv = db.Column(db.Integer, nullable=False)
     amt = db.Column(db.Integer, nullable=False)    
+
+
+
+def create_linechart_tables():
+    # Explicitly creating tables for a specific bind
+    engine = db.get_engine(app, bind='linechart_db')
+    Linechart_DataPoint.metadata.create_all(engine)
+    populate_linechart_db()    
 
 
 
@@ -183,11 +204,14 @@ def create_barchart_tables():
     Barchart_DataPoint.metadata.create_all(engine)
     populate_Barchart_db()
 
-def create_linechart_tables():
+
+
+def create_simpletable_tables():
     # Explicitly creating tables for a specific bind
-    engine = db.get_engine(app, bind='linechart_db')
-    Linechart_DataPoint.metadata.create_all(engine)
-    populate_linechart_db()    
+    engine = db.get_engine(app, bind='simpletable_db')
+    Simpletable_DataPoint.metadata.create_all(engine)
+    populate_Simpletable_db()
+
 
 '''def populate_db():
     data = [
@@ -247,6 +271,35 @@ def populate_Barchart_db():
 
     db.session.bulk_save_objects(data)
     db.session.commit()
+
+
+
+
+def populate_Simpletable_db():
+    start_date = datetime(2023, 1, 1)  # Start date of the data generation period
+    end_date = datetime(2024, 5, 9)  # End date
+    delta = timedelta(days=1)  # Difference of one day
+    pages = ["Page A", "Page B", "Page C", "Page D", "Page E", "Page F", "Page G"]
+    data = []
+
+    current_date = start_date
+    while current_date <= end_date:
+        for page in pages:
+            data.append(Simpletable_DataPoint(
+                name=page,
+                uv=random.randint(1000, 5000),  # Random UV between 1000 and 5000
+                pv=random.randint(1000, 5000),  # Random PV similarly
+                amt=random.randint(1000, 5000),  # Random AMT
+                date=current_date
+            ))
+        current_date += delta
+
+    db.session.bulk_save_objects(data)
+    db.session.commit()
+
+
+
+
 
 
 # Routes
@@ -435,6 +488,40 @@ def get_barchart_data():
 
 
 
+@app.route("/api/simpletable_data")
+def get_simpletable_data():
+    logging.info("Received request for /api/linechart_data")
+    # Optional: Get date from query parameters, format should be 'YYYY-MM-DD'
+    query_date = request.args.get('date')
+    
+    if query_date:
+        try:
+            print(f"Attempting to parse date for Simpletable: {query_date}")
+            specific_date = datetime.strptime(query_date, '%Y-%m-%d').date()
+            print('specific date for Simpletable',specific_date)
+            data_points = Simpletable_DataPoint.query.filter(Simpletable_DataPoint.date == specific_date).all()
+            print('data_points',data_points)
+        except ValueError:
+            print("Date parsing failed due to ValueError")
+            return jsonify({'error': 'Invalid date format, please use YYYY-MM-DD'}), 400
+    else:
+        # Find the latest date in the database if no date is provided
+        latest_date = db.session.query(db.func.max(Simpletable_DataPoint.date)).scalar()
+        data_points = Simpletable_DataPoint.query.filter(Simpletable_DataPoint.date == latest_date).all()
+
+    result = [
+        {"name": dp.name, "uv": dp.uv, "pv": dp.pv, "amt": dp.amt}
+        for dp in data_points
+    ]
+     # Get column names from the model
+    columns = [column.name for column in Simpletable_DataPoint.__table__.columns if column.name != 'id' and column.name != 'date']
+
+    print(' Simpletable result',result)
+    #return jsonify(result)
+    return jsonify({'tabledata': result, 'columns': columns})
+
+
+
 
 
 '''@app.route("/api/linechart_data")
@@ -464,6 +551,21 @@ def get_barchart_data():
     ]
     return jsonify(data)'''
 
+
+@app.route('/api/table_data')
+def get_table_data():
+    # Simulate fetching data from a database or any other source
+    data = [
+        {"name": "Page A", "uv": 4000, "pv": 2400, "amt": 2400},
+        {"name": "Page B", "uv": 3000, "pv": 1398, "amt": 2210},
+        {"name": "Page C", "uv": 2000, "pv": 9800, "amt": 2290},
+        {"name": "Page D", "uv": 2780, "pv": 3908, "amt": 2000},
+        {"name": "Page E", "uv": 1890, "pv": 4800, "amt": 2181},
+        {"name": "Page F", "uv": 2390, "pv": 3800, "amt": 2500},
+        {"name": "Page G", "uv": 3490, "pv": 4300, "amt": 2100}
+    ]
+    return jsonify(data)
+
 '''def populate_db():
     data = [
         DataPoint(name="Page A", uv=4000, pv=2400, amt=2400),
@@ -485,4 +587,5 @@ if __name__ == "__main__":
     with app.app_context():
         create_linechart_tables()
         create_barchart_tables()
+        create_simpletable_tables()
     app.run(debug=True)

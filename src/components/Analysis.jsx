@@ -19,6 +19,8 @@ const Analysis = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [linechartData, setLineChartData] = useState([]); // State to hold fetched data
   const [barchartData, setBarChartData] = useState([]);
+  const [simpletableData, setSimpleTableData] = useState([]);
+  const [simpletableColumn, setSimpleTableColumn] = useState([]);
 
   const fetchLinechartData = async (date) => {
     console.log('Fetching data for:', date);  // Verify this gets called
@@ -52,6 +54,25 @@ const Analysis = () => {
     }
   };
 
+
+
+  const fetchSimpletableData = async (date) => {
+    console.log('Fetching table data for:', date);  // Verify this gets called
+    const formattedDate = date.toISOString().split('T')[0]; // Format date to 'YYYY-MM-DD'
+    try {
+      const response = await fetch(`http://localhost:5000/api/simpletable_data?date=${formattedDate}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const jsonData = await response.json();
+      setSimpleTableData(jsonData.tabledata); // Set fetched data to state
+      setSimpleTableColumn(jsonData.columns);
+      console.log('table data recieved in analysis component for simple table')
+    } catch (error) {
+      console.error('There has been a problem with your fetch operation:', error);
+    }
+  };
+
   return (
     <MDBContainer >
       <div style={{ overflowY: 'auto', maxHeight: '100vh', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
@@ -76,6 +97,7 @@ const Analysis = () => {
                     setSelectedDate(date);
                     fetchLinechartData(date); // Trigger data fetch on date change
                     fetchBarchartData(date);
+                    fetchSimpletableData(date);
                   }}
                 />
 
@@ -83,7 +105,7 @@ const Analysis = () => {
             </MDBRow>
             <MDBRow>
               <MDBCol md="6" className="p-2">
-                <SimpleTable />
+                <SimpleTable simpletabledata={simpletableData} simpletableColumn={simpletableColumn} />
               </MDBCol>
               <MDBCol md="6" className="p-2">
                 <TaskTableComponent />
