@@ -33,7 +33,7 @@ const BarChatComponent = ({selectedDate, bardata}) => {
         
       >
         <MDBCardBody>
-          <h4 className="text-center mb-4">Data Visualization</h4>
+          <h4 className="text-center mb-4">Bar Chart</h4>
           <ResponsiveContainer width="100%" height={300}>
         <BarChart
           width={500}

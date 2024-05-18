@@ -429,95 +429,69 @@ def get_linechart_data():
 @app.route("/api/linechart_data")
 def get_linechart_data():
     logging.info("Received request for /api/linechart_data")
-    # Optional: Get date from query parameters, format should be 'YYYY-MM-DD'
-    query_date = request.args.get('date')
+    start_date = request.args.get('start')
+    end_date = request.args.get('end')
     
-    if query_date:
-        try:
-            print(f"Attempting to parse date: {query_date}")
-            specific_date = datetime.strptime(query_date, '%Y-%m-%d').date()
-            print('specific date',specific_date)
-            data_points = Linechart_DataPoint.query.filter(Linechart_DataPoint.date == specific_date).all()
-            print('data_points',data_points)
-        except ValueError:
-            print("Date parsing failed due to ValueError")
-            return jsonify({'error': 'Invalid date format, please use YYYY-MM-DD'}), 400
-    else:
-        # Find the latest date in the database if no date is provided
-        latest_date = db.session.query(db.func.max(Linechart_DataPoint.date)).scalar()
-        data_points = Linechart_DataPoint.query.filter(Linechart_DataPoint.date == latest_date).all()
-
-    result = [
-        {"name": dp.name, "uv": dp.uv, "pv": dp.pv, "amt": dp.amt}
-        for dp in data_points
-    ]
-    print('result',result)
+    try:
+        if start_date and end_date:
+            start = datetime.strptime(start_date, '%Y-%m-%d').date()
+            end = datetime.strptime(end_date, '%Y-%m-%d').date()
+            data_points = Linechart_DataPoint.query.filter(Linechart_DataPoint.date.between(start, end)).all()
+        else:
+            latest_date = db.session.query(db.func.max(Linechart_DataPoint.date)).scalar()
+            data_points = Linechart_DataPoint.query.filter(Linechart_DataPoint.date == latest_date).all()
+    except ValueError:
+        return jsonify({'error': 'Invalid date format, please use YYYY-MM-DD'}), 400
+    
+    result = [{"name": dp.name, "uv": dp.uv, "pv": dp.pv, "amt": dp.amt} for dp in data_points]
     return jsonify(result)
-
 
 
 
 @app.route("/api/barchart_data")
 def get_barchart_data():
-    logging.info("Received request for /api/linechart_data")
-    # Optional: Get date from query parameters, format should be 'YYYY-MM-DD'
-    query_date = request.args.get('date')
+    logging.info("Received request for /api/barchart_data")
+    start_date = request.args.get('start')
+    end_date = request.args.get('end')
     
-    if query_date:
-        try:
-            print(f"Attempting to parse date for bar chart: {query_date}")
-            specific_date = datetime.strptime(query_date, '%Y-%m-%d').date()
-            print('specific date for bar chart',specific_date)
-            data_points = Barchart_DataPoint.query.filter(Barchart_DataPoint.date == specific_date).all()
-            print('data_points',data_points)
-        except ValueError:
-            print("Date parsing failed due to ValueError")
-            return jsonify({'error': 'Invalid date format, please use YYYY-MM-DD'}), 400
-    else:
-        # Find the latest date in the database if no date is provided
-        latest_date = db.session.query(db.func.max(Barchart_DataPoint.date)).scalar()
-        data_points = Barchart_DataPoint.query.filter(Barchart_DataPoint.date == latest_date).all()
-
-    result = [
-        {"name": dp.name, "uv": dp.uv, "pv": dp.pv}
-        for dp in data_points
-    ]
-    print(' bar chart result',result)
+    try:
+        if start_date and end_date:
+            start = datetime.strptime(start_date, '%Y-%m-%d').date()
+            end = datetime.strptime(end_date, '%Y-%m-%d').date()
+            data_points = Barchart_DataPoint.query.filter(Barchart_DataPoint.date.between(start, end)).all()
+        else:
+            latest_date = db.session.query(db.func.max(Barchart_DataPoint.date)).scalar()
+            data_points = Barchart_DataPoint.query.filter(Barchart_DataPoint.date == latest_date).all()
+    except ValueError:
+        return jsonify({'error': 'Invalid date format, please use YYYY-MM-DD'}), 400
+    
+    result = [{"name": dp.name, "uv": dp.uv, "pv": dp.pv} for dp in data_points]
     return jsonify(result)
-
 
 
 
 @app.route("/api/simpletable_data")
 def get_simpletable_data():
-    logging.info("Received request for /api/linechart_data")
-    # Optional: Get date from query parameters, format should be 'YYYY-MM-DD'
-    query_date = request.args.get('date')
+    logging.info("Received request for /api/simpletable_data")
+    start_date = request.args.get('start')
+    print('start date: ', start_date)
+    end_date = request.args.get('end')
+    print('end date: ', end_date)
     
-    if query_date:
-        try:
-            print(f"Attempting to parse date for Simpletable: {query_date}")
-            specific_date = datetime.strptime(query_date, '%Y-%m-%d').date()
-            print('specific date for Simpletable',specific_date)
-            data_points = Simpletable_DataPoint.query.filter(Simpletable_DataPoint.date == specific_date).all()
-            print('data_points',data_points)
-        except ValueError:
-            print("Date parsing failed due to ValueError")
-            return jsonify({'error': 'Invalid date format, please use YYYY-MM-DD'}), 400
-    else:
-        # Find the latest date in the database if no date is provided
-        latest_date = db.session.query(db.func.max(Simpletable_DataPoint.date)).scalar()
-        data_points = Simpletable_DataPoint.query.filter(Simpletable_DataPoint.date == latest_date).all()
-
-    result = [
-        {"name": dp.name, "uv": dp.uv, "pv": dp.pv, "amt": dp.amt}
-        for dp in data_points
-    ]
-     # Get column names from the model
+    try:
+        if start_date and end_date:
+            print('dates recieved. start date:{start_date} and end date {emd_date}')
+            start = datetime.strptime(start_date, '%Y-%m-%d').date()
+            end = datetime.strptime(end_date, '%Y-%m-%d').date()
+            data_points = Simpletable_DataPoint.query.filter(Simpletable_DataPoint.date.between(start, end)).all()
+        else:
+            latest_date = db.session.query(db.func.max(Simpletable_DataPoint.date)).scalar()
+            data_points = Simpletable_DataPoint.query.filter(Simpletable_DataPoint.date == latest_date).all()
+    except ValueError:
+        return jsonify({'error': 'Invalid date format, please use YYYY-MM-DD'}), 400
+    
+    result = [{"name": dp.name, "uv": dp.uv, "pv": dp.pv, "amt": dp.amt} for dp in data_points]
     columns = [column.name for column in Simpletable_DataPoint.__table__.columns if column.name != 'id' and column.name != 'date']
-
-    print(' Simpletable result',result)
-    #return jsonify(result)
     return jsonify({'tabledata': result, 'columns': columns})
 
 
@@ -584,8 +558,8 @@ def get_table_data():
 
 
 if __name__ == "__main__":
-    with app.app_context():
+    '''with app.app_context():
         create_linechart_tables()
         create_barchart_tables()
-        create_simpletable_tables()
+        create_simpletable_tables()'''
     app.run(debug=True)

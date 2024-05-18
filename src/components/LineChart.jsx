@@ -21,7 +21,7 @@ import { MDBCard, MDBCardBody,} from "mdb-react-ui-kit";
   { name: "Page G", uv: 3490, pv: 4300, amt: 2100 },
 ];*/
 
-const LineChartComponent = ({ selectedDate, linedata}) => {
+const LineChartComponent = ({ linedata}) => {
   //const [data, setData] = useState([]);
   
 
@@ -50,7 +50,7 @@ const LineChartComponent = ({ selectedDate, linedata}) => {
       
     >
       <MDBCardBody>
-        <h4 className="text-center mb-4">Data Visualization</h4>
+        <h4 className="text-center mb-4">Line Chart</h4>x
         <ResponsiveContainer width="100%" height={300}>
           <LineChart
             data={linedata}

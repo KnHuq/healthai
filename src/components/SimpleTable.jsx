@@ -17,7 +17,7 @@ import {
   { name: "Page G", uv: 3490, pv: 4300, amt: 2100 },
 ];*/
 
-function SimpleTable({ selectedDate, simpletabledata, simpletableColumn }) {
+function SimpleTable({simpletabledata, simpletableColumn }) {
   return (
     <MDBCard className="bg-dark text-white my-3">
       <MDBCardBody>
