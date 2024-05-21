@@ -7,6 +7,8 @@ import re
 from datetime import datetime, timedelta, date
 import random
 import logging
+from fuzzywuzzy import process
+
 
 app = Flask(__name__)
 CORS(app)
@@ -363,7 +365,7 @@ def upload_file():
 
     return jsonify({"error": "Failed to upload file"}), 500
 
-
+'''
 @app.route("/match-words", methods=["POST"])
 def match_words():
     data = request.json
@@ -383,6 +385,45 @@ def match_words():
             )  # Move past the current match to find subsequent matches
     return jsonify({"matches": matches})
 
+'''
+
+
+
+@app.route("/match-words", methods=["POST"])
+def match_words():
+    data = request.json
+    text = data.get("text", "").lower().strip()
+    matches = []
+
+    # Define a threshold for fuzzy matching
+    threshold = 80
+
+    for keyword in KEYWORDS:
+        start = 0  # Start from the beginning of the text
+        while start < len(text):
+            # Find the keyword starting from 'start' using fuzzy matching
+            segment = text[start:]
+            best_match, score = process.extractOne(segment, [keyword])
+
+            if score < threshold:
+                break
+
+            index = segment.find(best_match)
+            if index == -1:
+                break
+
+            start += index
+            # Add the match with the current start and end indices
+            matches.append({"start": start, "end": start + len(best_match)})
+            start += len(best_match)  # Move past the current match to find subsequent matches
+
+    return jsonify({"matches": matches})
+
+
+
+
+
+
 
 """function to match the words to dictionary"""
 
@@ -391,7 +432,7 @@ for k, v in Ps_dictionary.items():
     for w in v:
         word_to_category[w.lower().strip()] = k
 
-
+'''
 def get_category_from_word(word: str) -> str:
     """
     This will find the category of the word from the Ps dictionary
@@ -401,8 +442,31 @@ def get_category_from_word(word: str) -> str:
         if key_word in word:
             return category
     return "Unknown"  # Return "Unknown" instead of None for better handling in the frontend
+'''
 
 
+
+
+def get_category_from_word(word: str) -> str:
+    """
+    This will find the category of the word from the Ps dictionary using fuzzy matching.
+    """
+    word = word.lower().strip()
+
+    # Define a threshold for fuzzy matching
+    threshold = 80
+
+    best_match, score = process.extractOne(word, list(word_to_category.keys()))
+
+    if score >= threshold:
+        return word_to_category[best_match]
+    return "Unknown"  # Return "Unknown" instead of None for better handling in the frontend
+
+
+
+
+
+'''
 @app.route("/category", methods=["GET"])
 def category():
     """
@@ -416,6 +480,26 @@ def category():
         return jsonify({"category": category})
     else:
         return jsonify({"error": "No word provided"}), 400
+'''
+
+
+
+@app.route("/category", methods=["GET"])
+def category():
+    """
+    This will receive the word from frontend
+    and call the function to find the category
+    of the word from the Ps dictionary.
+    """
+    word = request.args.get("word", "")
+    if word:
+        category = get_category_from_word(word)
+        return jsonify({"category": category})
+    else:
+        return jsonify({"error": "No word provided"}), 400
+
+
+
 '''
 @app.route("/api/linechart_data")
 def get_linechart_data():

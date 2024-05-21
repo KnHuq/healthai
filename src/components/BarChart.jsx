@@ -1,7 +1,17 @@
-import React, { useEffect, useState ,PureComponent } from 'react';
-import { BarChart, Bar, Rectangle, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import React, { useEffect, useState, PureComponent } from "react";
+import {
+  BarChart,
+  Bar,
+  Rectangle,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
-import { MDBCard, MDBCardBody} from "mdb-react-ui-kit";
+import { MDBCard, MDBCardBody, MDBCheckbox } from "mdb-react-ui-kit";
 
 /*const data = [
   { name: "Page A", uv: 4000, pv: 2400, amt: 2400 },
@@ -13,8 +23,9 @@ import { MDBCard, MDBCardBody} from "mdb-react-ui-kit";
   { name: "Page G", uv: 3490, pv: 4300, amt: 2100 },
 ];*/
 
-const BarChatComponent = ({selectedDate, bardata}) => {
-  
+const BarChatComponent = ({ selectedDate, bardata }) => {
+  const [showUv, setShowUv] = useState(true);
+  const [showPv, setShowPv] = useState(true);
   //const [data, setData] = useState([]);
 
   /*useEffect(() => {
@@ -27,35 +38,65 @@ const BarChatComponent = ({selectedDate, bardata}) => {
     fetchData();
   }, []);*/
 
-    return (
-      <MDBCard
-        className="bg-dark text-white my-3 "
-        
-      >
-        <MDBCardBody>
-          <h4 className="text-center mb-4">Bar Chart</h4>
-          <ResponsiveContainer width="100%" height={300}>
-        <BarChart
-          width={500}
-          height={300}
-          data={bardata}
-          
-         
+  return (
+    <MDBCard className="bg-dark text-white my-3 ">
+      <MDBCardBody>
+        <h4 className="text-center mb-4">Bar Chart</h4>
+        <div className="d-flex justify-content-center mb-3">
+            <MDBCheckbox
+              name="uvCheckbox"
+              label="UV"
+              checked={showUv}
+              onChange={(e) => setShowUv(e.target.checked)}
+              inline
+            />
+            <MDBCheckbox
+              name="pvCheckbox"
+              label="PV"
+              checked={showPv}
+              onChange={(e) => setShowPv(e.target.checked)}
+              inline
+            />
+          </div>
+        <div
+          style={{
+            width: "100%",
+            overflowX: "auto",
+            scrollbarWidth: "thin" /* Firefox */,
+            scrollbarColor: "inherit",
+            //msOverflowStyle: "-ms-autohiding-scrollbar" /* IE and Edge */,
+          }}
         >
-          console.log('Fetching data for:', date);
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey="pv" fill="#2575fc" activeBar={<Rectangle fill="pink" stroke="blue" />} />
-          <Bar dataKey="uv" fill="#dadce0" activeBar={<Rectangle fill="gold" stroke="purple" />} />
-        </BarChart>
-      </ResponsiveContainer>
+          <div style={{ width: "100vw" }}>
+            <ResponsiveContainer width="100%" height={300} >
+              <BarChart width={500} height={300} data={bardata}>
+                console.log('Fetching data for:', date);
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                {showPv && (
+                <Bar
+                  dataKey="pv"
+                  fill="#2575fc"
+                  activeBar={<Rectangle fill="pink" stroke="blue" />}
+                />
+              )}
+              {showUv && (
+                <Bar
+                  dataKey="uv"
+                  fill="#dadce0"
+                  activeBar={<Rectangle fill="gold" stroke="purple" />}
+                />
+              )}
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
       </MDBCardBody>
     </MDBCard>
   );
 };
 
-
-export default BarChatComponent
+export default BarChatComponent;
