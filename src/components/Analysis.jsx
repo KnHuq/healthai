@@ -27,9 +27,11 @@ const Analysis = () => {
   const fetchData = async () => {
     const startDate = dateRange[0];
     const endDate = dateRange[1];
-    await fetchLinechartData(startDate, endDate);
-    await fetchBarchartData(startDate, endDate);
+    // await fetchLinechartData(startDate, endDate);
+    // await fetchBarchartData(startDate, endDate);
+    console.log("fetching data");
     await fetchSimpletableData(startDate, endDate);
+    console.log("fetching data");
   };
 
   const fetchLinechartData = async (start, end) => {
@@ -37,7 +39,7 @@ const Analysis = () => {
     const formattedEndDate = end.toISOString().split("T")[0];
     try {
       const response = await fetch(
-        `http://localhost:5000/api/linechart_data?start=${formattedStartDate}&end=${formattedEndDate}`
+        `http://localhost:8080/api/linechart_data?start=${formattedStartDate}&end=${formattedEndDate}`
       );
       if (!response.ok) throw new Error("Network response was not ok");
       const jsonData = await response.json();
@@ -52,7 +54,7 @@ const Analysis = () => {
     const formattedEndDate = end.toISOString().split("T")[0];
     try {
       const response = await fetch(
-        `http://localhost:5000/api/barchart_data?start=${formattedStartDate}&end=${formattedEndDate}`
+        `http://localhost:8080/api/barchart_data?start=${formattedStartDate}&end=${formattedEndDate}`
       );
       if (!response.ok) throw new Error("Network response was not ok");
       const jsonData = await response.json();
@@ -66,9 +68,13 @@ const Analysis = () => {
     const formattedStartDate = start.toISOString().split("T")[0];
     const formattedEndDate = end.toISOString().split("T")[0];
     try {
+
+      console.log("fetching data start!!!");
       const response = await fetch(
-        `http://localhost:5000/api/simpletable_data?start=${formattedStartDate}&end=${formattedEndDate}`
+        `http://localhost:8080/api/simpletable_data?start=${formattedStartDate}&end=${formattedEndDate}`
       );
+      console.log("fetching data done!!!");
+      console.log(response);
       if (!response.ok) throw new Error("Network response was not ok");
       const jsonData = await response.json();
       setSimpleTableData(jsonData.tabledata);
