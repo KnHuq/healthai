@@ -581,6 +581,30 @@ def get_simpletable_data():
 
 
 
+@app.route("/api/formulation_data")
+def get_formulationbar_data():
+    data = {
+        "percentage": [
+            { "name": "Absent 5 P's Formulation", "FebMar2021": 31.8, "AugSept2021": 24.3 },
+            { "name": "Limited 5 P's Formulation", "FebMar2021": 31.6, "AugSept2021": 32.3 },
+            { "name": "Inclusive 5 P's Formulation", "FebMar2021": 36.7, "AugSept2021": 43.4 },
+            { "name": "Limited Integrated Formulation", "FebMar2021": 15.8, "AugSept2021": 17.6 },
+            { "name": "Inclusive Integrated Formulation", "FebMar2021": 0.4, "AugSept2021": 1.4 },
+        ],
+        "number": [
+            { "name": "Absent 5 P's Formulation", "FebMar2021": 500, "AugSept2021": 342 },
+            { "name": "Limited 5 P's Formulation", "FebMar2021": 497, "AugSept2021": 454 },
+            { "name": "Inclusive 5 P's Formulation", "FebMar2021": 577, "AugSept2021": 611 },
+            { "name": "Limited Integrated Formulation", "FebMar2021": 249, "AugSept2021": 247 },
+            { "name": "Inclusive Integrated Formulation", "FebMar2021": 7, "AugSept2021": 19 },
+        ]
+    }
+    return jsonify(data)
+
+
+
+
+
 
 '''@app.route("/api/linechart_data")
 def get_linechart_data():
@@ -642,8 +666,5 @@ def get_table_data():
 
 
 if __name__ == "__main__":
-    '''with app.app_context():
-        create_linechart_tables()
-        create_barchart_tables()
-        create_simpletable_tables()'''
+
     app.run(debug=True)

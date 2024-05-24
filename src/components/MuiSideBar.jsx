@@ -25,6 +25,7 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp'; // For "Log Out"
 import { NavLink, useNavigate } from 'react-router-dom';
 import UploadIcon from '@mui/icons-material/Upload';
 import AnalyticsIcon from '@mui/icons-material/Analytics';
+import TableBarIcon from '@mui/icons-material/TableBar';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 
 const drawerWidth = 240;
@@ -158,6 +159,14 @@ export default function MiniDrawer() {
                 <AnalyticsIcon />
               </ListItemIcon>
               <ListItemText primary="Analytics" />
+            </ListItemButton>
+          </ListItem>
+          <ListItem component={NavLink} to="/tablebar" disablePadding>
+            <ListItemButton>
+              <ListItemIcon>
+                <TableBarIcon />
+              </ListItemIcon>
+              <ListItemText primary="Table & Bar" />
             </ListItemButton>
           </ListItem>
           <ListItem component={NavLink} to="/textinput" disablePadding>

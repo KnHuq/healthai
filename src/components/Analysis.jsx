@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MDBContainer, MDBRow, MDBCol, MDBBtn } from "mdb-react-ui-kit";
 import Sidebar from "./Sidebar"; // Ensure this is pointing to your custom Sidebar component
 import UploadFormSidebar from "./UploadForm";
@@ -19,6 +19,9 @@ const Analysis = () => {
   const [simpletableData, setSimpleTableData] = useState([]);
   const [simpletableColumn, setSimpleTableColumn] = useState([]);
 
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   // Update to use dayjs for formatting dates
   const fetchData = async () => {
@@ -33,7 +36,9 @@ const Analysis = () => {
     const formattedStartDate = start.toISOString().split("T")[0];
     const formattedEndDate = end.toISOString().split("T")[0];
     try {
-      const response = await fetch(`http://localhost:5000/api/linechart_data?start=${formattedStartDate}&end=${formattedEndDate}`);
+      const response = await fetch(
+        `http://localhost:5000/api/linechart_data?start=${formattedStartDate}&end=${formattedEndDate}`
+      );
       if (!response.ok) throw new Error("Network response was not ok");
       const jsonData = await response.json();
       setLineChartData(jsonData);
@@ -46,7 +51,9 @@ const Analysis = () => {
     const formattedStartDate = start.toISOString().split("T")[0];
     const formattedEndDate = end.toISOString().split("T")[0];
     try {
-      const response = await fetch(`http://localhost:5000/api/barchart_data?start=${formattedStartDate}&end=${formattedEndDate}`);
+      const response = await fetch(
+        `http://localhost:5000/api/barchart_data?start=${formattedStartDate}&end=${formattedEndDate}`
+      );
       if (!response.ok) throw new Error("Network response was not ok");
       const jsonData = await response.json();
       setBarChartData(jsonData);
@@ -55,12 +62,13 @@ const Analysis = () => {
     }
   };
 
-
   const fetchSimpletableData = async (start, end) => {
     const formattedStartDate = start.toISOString().split("T")[0];
     const formattedEndDate = end.toISOString().split("T")[0];
     try {
-      const response = await fetch(`http://localhost:5000/api/simpletable_data?start=${formattedStartDate}&end=${formattedEndDate}`);
+      const response = await fetch(
+        `http://localhost:5000/api/simpletable_data?start=${formattedStartDate}&end=${formattedEndDate}`
+      );
       if (!response.ok) throw new Error("Network response was not ok");
       const jsonData = await response.json();
       setSimpleTableData(jsonData.tabledata);
@@ -81,16 +89,20 @@ const Analysis = () => {
         }}
       >
         <MDBRow className="align-items-center justify-content-end">
-              <MDBCol md="6" className="p-2 d-flex justify-content-center">
-                <ControlledDateRangePicker
-                  value={dateRange}
-                  onChange={setDateRange}
-                />
-                <MDBBtn className="bg-dark text-white" color="primary" onClick={fetchData}>
-                  Analyse
-                </MDBBtn>
-              </MDBCol>
-            </MDBRow>
+          <MDBCol md="6" className="p-2 d-flex justify-content-center">
+            <ControlledDateRangePicker
+              value={dateRange}
+              onChange={setDateRange}
+            />
+            <MDBBtn
+              className="bg-dark text-white"
+              color="primary"
+              onClick={fetchData}
+            >
+              Analyse
+            </MDBBtn>
+          </MDBCol>
+        </MDBRow>
         <MDBRow className="flex">
           <MDBCol sm="2" className="p-0">
             <MiniDrawer />
