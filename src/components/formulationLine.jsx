@@ -19,7 +19,7 @@ const FormulationLine = () => {
   
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/formulation_data")
+    fetch("http://localhost:8080/api/formulation_data")
       .then((response) => response.json())
       .then((data) => setData(data))
       .catch((error) => console.error("Error fetching data:", error));
