@@ -34,13 +34,16 @@ def get_formulationbar_data():
             { "name": "Inclusive Integrated Formulation", "FebMar2021": 0.4, "AugSept2021": 1.4 },
         ],
         "number": [
-            { "name": "Absent 5 P's Formulation", "FebMar2021": 500, "AugSept2021": 342 },
-            { "name": "Limited 5 P's Formulation", "FebMar2021": 497, "AugSept2021": 454 },
-            { "name": "Inclusive 5 P's Formulation", "FebMar2021": 577, "AugSept2021": 611 },
-            { "name": "Limited Integrated Formulation", "FebMar2021": 249, "AugSept2021": 247 },
-            { "name": "Inclusive Integrated Formulation", "FebMar2021": 7, "AugSept2021": 19 },
+            { "name": "Absent 5 P's Formulation", "Feb": 500, "March": 342 , },
+            { "name": "Limited 5 P's Formulation", "Feb": 497, "Dec": 454 },
+            { "name": "Inclusive 5 P's Formulation", "March": 577, "April": 611, "Dec": 611 },
+            { "name": "Limited Integrated Formulation", "March": 249, "April": 247 },
+            { "name": "Inclusive Integrated Formulation", "Feb": 7, "March": 19 , "April": 19 },
         ]
     }
+
+
+
     return jsonify(data)
 
 
