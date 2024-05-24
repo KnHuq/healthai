@@ -14,8 +14,8 @@ integrated_formulations = {
 
 presentation_factors = {
     "first_order": {
-        "exact": [ "symptom"],
-        "prefix": ["present", "histor", "hx", "sx"]    
+        "exact": [ "symptom", "hx", "sx"],
+        "prefix": ["present", "histor"]    
     }, 
     "second_order": {
         "exact": ["admission-to", "arrived", "concerns", "current-episode", "experiencing"],
@@ -33,11 +33,6 @@ precipitating_factors = {
         "exact": ["relapse", "instigate", "induced", "exacerbated"],
         "prefix": []
     }
-}
-
-predisposing_factors = {
-    "exact": ["background", "hereditary", "pattern", "records", "genetically"],
-    "prefix": ["predispos", "vulnerab"]
 }
 
 predisposing_factors = {
@@ -75,8 +70,8 @@ protective_factors = {
 
 multiple_factors = {
     "first_order": {
-        "exact": ["history", "background", "trigger"],
-        "prefix": ["hx"]
+        "exact": ["history", "background", "trigger", "hx"],
+        "prefix": []
     },
     "second_order": {
         "exact": ["substance", "abuse", "stressors", "support", "experience"],
