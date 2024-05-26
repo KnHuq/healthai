@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   MDBContainer,
   MDBRow,
@@ -106,51 +106,6 @@ const colors = [
 ];
 
 const DataVisualization = ({ title, data }) => {
-  const [selectedKeys, setSelectedKeys] = useState([]);
-
-  useEffect(() => {
-    // Preselect top 5 keys based on the total value over all months
-    const keysWithTotals = Object.keys(data[0])
-      .filter(key => key.endsWith(' (%)'))
-      .map(key => {
-        const total = data.reduce((sum, item) => sum + (item[key] || 0), 0);
-        return { key, total };
-      })
-      .sort((a, b) => b.total - a.total)
-      .slice(0, 5)
-      .map(item => item.key);
-
-    setSelectedKeys(keysWithTotals);
-  }, [data]);
-
-  const handleCheckboxChange = (key) => {
-    setSelectedKeys(prevKeys =>
-      prevKeys.includes(key) ? prevKeys.filter(k => k !== key) : [...prevKeys, key]
-    );
-  };
-
-  const renderCheckboxes = () => {
-    const keys = Object.keys(data[0]).filter(key => key.endsWith(' (%)'));
-    return (
-      <div className="d-flex justify-content-center flex-wrap mb-3">
-        {keys.map(key => (
-          <div key={key} className="form-check form-check-inline text-white">
-            <input
-              className="form-check-input"
-              type="checkbox"
-              id={key}
-              checked={selectedKeys.includes(key)}
-              onChange={() => handleCheckboxChange(key)}
-            />
-            <label className="form-check-label" htmlFor={key}>
-              {key.replace(' (%)', '')}
-            </label>
-          </div>
-        ))}
-      </div>
-    );
-  };
-
   const renderTableHeaders = (data) => {
     const keys = Object.keys(data[0]).filter(key => !key.endsWith(' (%)') && key !== 'month').sort();
     return (
@@ -182,7 +137,8 @@ const DataVisualization = ({ title, data }) => {
   };
 
   const renderLineChartLines = (data) => {
-    return selectedKeys.map((key, index) => (
+    const keys = Object.keys(data[0]).filter(key => key.endsWith(' (%)'));
+    return keys.map((key, index) => (
       <Line key={key} type="monotone" dataKey={key} stroke={colors[index % colors.length]} strokeWidth={3} />
     ));
   };
@@ -192,8 +148,24 @@ const DataVisualization = ({ title, data }) => {
       <MDBCol md="12" className="p-2">
         <MDBCard className="bg-dark text-white my-3">
           <MDBCardBody>
-            <h4 className="bg-dark text-white text-center mb-4">{title} Line Chart</h4>
-            {renderCheckboxes()}
+            <h4 className="bg-dark text-white text-center mb-4">{title}</h4>
+            <MDBTable responsive>
+              <MDBTableHead>
+                {data.length > 0 && renderTableHeaders(data)}
+              </MDBTableHead>
+              <MDBTableBody>
+                {renderTableRows(data)}
+              </MDBTableBody>
+            </MDBTable>
+          </MDBCardBody>
+        </MDBCard>
+      </MDBCol>
+      <MDBCol md="12" className="p-2">
+        <MDBCard className="bg-dark text-white my-3">
+          <MDBCardBody>
+            <div className="d-flex justify-content-center align-items-center mb-4">
+              <h4 className="mb-0">{title} Line Chart</h4>
+            </div>
             <ResponsiveContainer width="100%" height={400}>
               <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 30 }}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -208,21 +180,6 @@ const DataVisualization = ({ title, data }) => {
                 {data.length > 0 && renderLineChartLines(data)}
               </LineChart>
             </ResponsiveContainer>
-          </MDBCardBody>
-        </MDBCard>
-      </MDBCol>
-      <MDBCol md="12" className="p-2">
-        <MDBCard className="bg-dark text-white my-3">
-          <MDBCardBody>
-            <h4 className="bg-dark text-white text-center mb-4">{title}</h4>
-            <MDBTable responsive>
-              <MDBTableHead>
-                {data.length > 0 && renderTableHeaders(data)}
-              </MDBTableHead>
-              <MDBTableBody>
-                {renderTableRows(data)}
-              </MDBTableBody>
-            </MDBTable>
           </MDBCardBody>
         </MDBCard>
       </MDBCol>

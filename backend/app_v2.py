@@ -3,7 +3,8 @@ from flask_cors import CORS
 from datetime import datetime
 import pandas as pd
 from lib.formula_cal import get_formulation_label, get_grouping_label
-
+from collections import Counter
+from functools import reduce
 app = Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
 
@@ -125,6 +126,7 @@ def formulationtable_data():
     # group by month
     filtered_data['iformula'] = [i[0][0] for i in all_results]
     filtered_data['factors'] = [i[0][1] for i in all_results]
+    filtered_data['key_words'] = [r[0][-1] for r in all_results]
     grouped_data = filtered_data.groupby('month')
     final_dict = {}
     for group_n, group_df in grouped_data:
@@ -156,10 +158,115 @@ def formulationtable_data():
         d.update({k: v for k, v in v.items()})
         data.append(d)
         
-    response_data = {
-        "bar_data": data,
-        "line_data": data
+    # response_data = {
+    #     "bar_data": data,
+    #     "line_data": data
+    # }
+
+
+
+    ############## TEMPLATE DATA ################
+
+    final_template_data = []
+    for group_n, group_df in grouped_data:
+            template_data = {
+            'Case Review': 0,
+            'Transfer of Care': 0,
+            'Longitudinal Summary': 0,
+            'Focused Assessment plus Substance Use': 0,
+            'Child and Youth Mental Health Assessment': 0,
+            'Focused Assessment': 0,
+            'Comprehensive Assessment': 0,
+            'Forensic Comprehensive Assessment': 0}
+
+            d = group_df["Template"].value_counts().to_dict()
+            template_data.update(d)
+            total = sum([v for k,v in template_data.items()])
+            template_data.update({k+ " (%)": round((v/total)*100,2) for k, v in template_data.items()})    
+            template_data['month'] = group_n.to_timestamp().isoformat()
+            final_template_data.append(template_data)
+
+    ################# GROUP DATA ####################
+    group_df['grouped_char_len'].value_counts().to_dict()
+
+    final_grouped_data = []
+
+
+    replaced_data_dict = {
+        '0-250': "Group 1 (0-250)",
+        '251-500': "Group 2 (251-500)",
+        '501-1001': "Group 3 (501-1001)",
+        '1001-2500': "Group 4 (1001-2500)",
+        '2501-5000': "Group 5 (2501-5000)",
+        '5001+': "Group 6 (5001+)"
     }
+
+
+    for group_n, group_df in grouped_data:
+        grouped_data_dict = {
+            '0-250': 0,
+            '251-500': 0,
+            '501-1001': 0,
+            '1001-2500': 0,
+            '2501-5000': 0,
+            '5001+': 0
+        }
+        d = group_df['grouped_char_len'].value_counts().to_dict()
+        grouped_data_dict.update(d)
+        changed_grouped_data = {}
+        for k,v in grouped_data_dict.items():
+            changed_grouped_data[replaced_data_dict[k]] = v
+        grouped_data_dict = changed_grouped_data
+
+        total = sum([v for k,v in grouped_data_dict.items()])
+        grouped_data_dict.update({k+ " (%)": round((v/total)*100,2) for k, v in grouped_data_dict.items()})
+        grouped_data_dict['month'] = group_n.to_timestamp().isoformat()
+        
+        
+        final_grouped_data.append(grouped_data_dict)
+
+    ######## WORD COUNT DATA ########
+
+    word_counts_dict = {}
+    for group_n, group_df in grouped_data:
+        g_d = dict(Counter(sum(list(group_df['key_words']),[])))
+        word_counts_dict[group_n.to_timestamp().isoformat()] = g_d
+
+    # only keep those keys which are present in each of the date
+    v_list = []
+    for k,v in word_counts_dict.items():
+        v_list.append(list(v.keys()))
+    # from the list of list only get the items that are present in each of the list
+    
+    common_keys = list(reduce(set.intersection, [set(item) for item in v_list]))
+
+    final_word_counts_data = []
+    for date,v in word_counts_dict.items():
+        d = {}
+        for c_k in common_keys:
+            total = sum([v2 for k2,v2 in v.items()])
+            for k2,v2 in v.items():
+                if k2 in common_keys:
+                    d[k2] = v2
+                    d[k2+" (%)"] = round((v2/total)*100,2)            
+        d['month'] = date
+        final_word_counts_data.append(d)
+
+
+
+    response_data = [
+
+        {"title": "Comparison of Formulations in Selected Clinical Notes Over Time",
+        "data": data},
+        {"title": "Comparision of the Clinical Note Templates (notes that have text) Over Time",
+        "data": final_template_data},
+        {"title": "Grouped Number of Characters in the Clinical Notes Over Time",
+        "data": final_grouped_data},
+        { "title" : " Comparision of the Each Key Word Present in Selected Clinical Notes Over Time",
+         "data": final_word_counts_data}
+    ]
+
+
     return jsonify(response_data)
 
 
