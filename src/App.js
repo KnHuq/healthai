@@ -6,6 +6,7 @@ import AdminAuthPage from './components/AdminAuthPage'
 import RegistrationForm from "./components/RegistrationForm";
 import Analysis from "./components/Analysis";
 import TextDisplayFeaturePage from "./components/TextDisplayFeaturePage";
+import TableBarAnalysis from "./components/tableBarAnalysis";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/register" element={<RegistrationForm />} />
         <Route path="/analysis" element={<Analysis />} />
         <Route path="/textinput" element={<TextDisplayFeaturePage />} />
+        <Route path="/tablebar" element={<TableBarAnalysis />} />
       </Routes>
     </Router>
   );
