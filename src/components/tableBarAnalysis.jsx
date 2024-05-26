@@ -1,5 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { MDBContainer, MDBRow, MDBCol, MDBCard, MDBCardBody, MDBBtn, MDBTable, MDBTableBody, MDBTableHead } from "mdb-react-ui-kit";
+import {
+  MDBContainer,
+  MDBRow,
+  MDBCol,
+  MDBCard,
+  MDBCardBody,
+  MDBBtn,
+  MDBTable,
+  MDBTableBody,
+  MDBTableHead,
+} from "mdb-react-ui-kit";
 import Sidebar from "./Sidebar"; // Ensure this is pointing to your custom Sidebar component
 import UploadFormSidebar from "./UploadForm";
 import LineChartComponent from "./LineChart";
@@ -32,7 +42,6 @@ import {
 } from "recharts";
 import TextField from "@mui/material/TextField";
 import * as d3 from "d3";
-
 
 const DarkTextField = styled(TextField)({
   "& .MuiInputBase-root": {
@@ -101,13 +110,27 @@ const darkTheme = createTheme({
 
 const TableBarAnalysis = () => {
   const [Linedata, setLineData] = useState([]);
+  const [tabledata, setTableData] = useState({
+    headers: [],
+    percentage: [],
+    number: [],
+  });
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
 
-
-
-
-  
+  const fetchTableData = async () => {
+    const url = "http://localhost:8080/api/formulationtable_data";
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const jsonData = await response.json();
+      setTableData(jsonData);
+    } catch (error) {
+      console.error("Failed to fetch data:", error);
+    }
+  };
 
   const fetchFormulateLineData = async () => {
     const start = startDate.toISOString().split("T")[0];
@@ -115,29 +138,33 @@ const TableBarAnalysis = () => {
     const url = `http://localhost:8080/api/formulation_data?start_date=${start}&end_date=${end}`;
     try {
       const response = await fetch(url);
-      console.log('fetching data');
+      console.log("fetching data");
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
       const jsonData = await response.json();
-      console.log("API response data:", jsonData); // Debug log
+      console.log("API response data:", jsonData);
 
-      // Parse the date strings to Date objects using d3.timeParse
       const parseDate = d3.timeParse("%Y-%m-%dT%H:%M:%S");
       const parsedData = jsonData.map((item) => {
         const parsedMonth = parseDate(item.month);
-        console.log("Parsed month:", parsedMonth); // Debug log
+        console.log("Parsed month:", parsedMonth);
         return {
           ...item,
           month: parsedMonth,
         };
       });
 
-      console.log("Parsed data:", parsedData); // Debug log
+      console.log("Parsed data:", parsedData);
       setLineData(parsedData);
     } catch (error) {
       console.error("Failed to fetch data:", error);
     }
+  };
+
+  const handleClick = () => {
+    fetchFormulateLineData();
+    fetchTableData();
   };
 
   return (
@@ -170,7 +197,7 @@ const TableBarAnalysis = () => {
                     onChange={(newValue) => setEndDate(newValue)}
                     renderInput={(params) => <DarkTextField {...params} />}
                   />
-                  <MDBBtn color="light" onClick={fetchFormulateLineData}>
+                  <MDBBtn color="light" onClick={handleClick}>
                     Fetch Data
                   </MDBBtn>
                 </div>
@@ -183,6 +210,54 @@ const TableBarAnalysis = () => {
             <MiniDrawer />
           </MDBCol>
           <MDBCol md="10" className="p-0">
+            <MDBRow>
+              <MDBCol md="12" className="p-2">
+                <MDBCard className="bg-dark text-white my-3">
+                  <MDBCardBody>
+                    <h4 className="bg-dark text-white text-center mb-4">
+                      Formulation Table
+                    </h4>
+                    <div>
+                      <MDBTable responsive>
+                        <MDBTableHead>
+                          <tr>
+                            {tabledata.headers.map((header, index) => (
+                              <th
+                                key={index}
+                                className="bg-dark text-white text-center"
+                              >
+                                {header}
+                              </th>
+                            ))}
+                          </tr>
+                        </MDBTableHead>
+                        <MDBTableBody>
+                          {tabledata.number.map((item, index) => (
+                            <tr key={index}>
+                              <td className="bg-dark text-white text-center">
+                                {item.name}
+                              </td>
+                              <td className="bg-dark text-white text-center">
+                                {item.FebMar2021}
+                              </td>
+                              <td className="bg-dark text-white text-center">
+                                {tabledata.percentage[index]?.FebMar2021}%
+                              </td>
+                              <td className="bg-dark text-white text-center">
+                                {item.AugSept2021}
+                              </td>
+                              <td className="bg-dark text-white text-center">
+                                {tabledata.percentage[index]?.AugSept2021}%
+                              </td>
+                            </tr>
+                          ))}
+                        </MDBTableBody>
+                      </MDBTable>
+                    </div>
+                  </MDBCardBody>
+                </MDBCard>
+              </MDBCol>
+            </MDBRow>
             <MDBRow>
               <MDBCard className="bg-dark text-white my-3">
                 <MDBCardBody>
@@ -246,18 +321,6 @@ const TableBarAnalysis = () => {
                   </div>
                 </MDBCardBody>
               </MDBCard>
-            </MDBRow>
-
-            <MDBRow>
-              <MDBCol md="12" className="p-2">
-                {/*<SimpleTable
-                  simpletabledata={simpletableData}
-                  simpletableColumn={simpletableColumn}
-                  />*/}
-              </MDBCol>
-              <MDBCol md="6" className="p-2">
-                <TaskTableComponent />
-              </MDBCol>
             </MDBRow>
           </MDBCol>
         </MDBRow>
