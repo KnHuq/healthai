@@ -14,7 +14,7 @@ integrated_formulations = {
 
 presentation_factors = {
     "first_order": {
-        "exact": [ "symptom", "hx", "sx"],
+        "exact": [ "symptom"],
         "prefix": ["present", "histor"]    
     }, 
     "second_order": {
