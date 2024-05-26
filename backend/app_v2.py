@@ -1,61 +1,57 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from datetime import datetime
-
+import pandas as pd
+from lib.formula_cal import get_formulation_label, get_grouping_label
 
 app = Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
 
-
-# @app.route('/api/simpletable_data', methods=['GET'])
-# def simpletable_data():
-#     print ("simpletable_data got called")
-#     start = request.args.get('start')
-#     end = request.args.get('end')
-#     data = [
-#             {"name": "Page A", "uv": 4000, "pv": 2400, "amt": 2400},
-#             {"name": "Page B", "uv": 3000, "pv": 1398, "amt": 2210},
-#             {"name": "Page C", "uv": 2000, "pv": 9800, "amt": 2290},
-#             {"name": "Page D", "uv": 2780, "pv": 3908, "amt": 2000},
-#             {"name": "Page E", "uv": 1890, "pv": 4800, "amt": 2181},
-#             {"name": "Page F", "uv": 2390, "pv": 3800, "amt": 2500},
-#             {"name": "Page G", "uv": 3490, "pv": 4300, "amt": 2100}
-#         ]
-#     columns = ["name", "uv", "pv", "amt"]
-
-#     return jsonify({'tabledata': data, 'columns': columns})
+DATA  = "/Users/kazinazmulhaque/work/QH/data/data.csv"
+DATA_DF = pd.read_csv(DATA)
+DATA_DF['eventdate'] = pd.to_datetime(DATA_DF['eventdate'])
 
 
 @app.route("/api/formulation_data")
 def get_formulationline_data():
+    global DATA_DF
     # Extract start_date and end_date from query parameters
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")
-    print(("getting data"))
-    data = [
-        {
-            "month": datetime(2023, 3, 30),
-            "Absent 5 P's Formulation": 31.8,
-            "Limited 5 P's Formulation": 31.6,
-            "Inclusive 5 P's Formulation": 36.7,
-            "Limited Integrated Formulation": 15.8,
-            "Inclusive Integrated Formulation": 0.4,
-        },
-        {
-            "month": datetime(2023, 9, 30),
-            "Absent 5 P's Formulation": 24.3,
-            "Limited 5 P's Formulation": 32.3,
-            "Inclusive 5 P's Formulation": 43.4,            
-            "Limited Integrated Formulation": 17.6,
-            "Inclusive Integrated Formulation": 1.4,
-        },
-        
-    ]
-    # Convert the datetime objects to ISO format for JSON serialization
-    for entry in data:
-        entry["month"] = entry["month"].isoformat()
+    start_date = pd.to_datetime(start_date, format="%Y-%m-%d", errors='coerce')
+    end_date = pd.to_datetime(end_date, format="%Y-%m-%d", errors='coerce')
 
-    print((data))
+    # filter the data
+    filtered_data = DATA_DF[(DATA_DF['eventdate'] >= start_date) & (DATA_DF['eventdate'] <= end_date)]
+    filtered_data.sort_values(by='eventdate', ascending=True, inplace=True)
+    if filtered_data.empty:
+        return jsonify([])
+    
+    filtered_data['month'] = filtered_data['eventdate'].dt.to_period('M')
+    all_results = list(map(get_formulation_label, list(filtered_data['formulationOverallClinicalImpression'])))
+
+
+    # group by month
+    filtered_data['iformula'] = [i[0][0] for i in all_results]
+    filtered_data['factors'] = [i[0][1] for i in all_results]
+    grouped_data = filtered_data.groupby('month')
+    final_dict = {}
+    for group_n, group_df in grouped_data:
+        d = group_df['factors'].value_counts().to_dict()
+        d.update((group_df['iformula'].value_counts().to_dict()))
+        del d['Absent Integrated Formulation']
+        final_dict[group_n.to_timestamp().isoformat()] = d
+
+    data = []
+
+    for k, v in final_dict.items():
+        d = {
+            "month": k,
+        }
+        total = sum([v for k,v in v.items()])
+        d.update({k: round((v/total)*100,2) for k, v in v.items()})
+        data.append(d)
+
     return jsonify(data)
 
 
