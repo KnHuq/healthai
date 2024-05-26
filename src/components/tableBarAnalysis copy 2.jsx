@@ -24,16 +24,9 @@ import {
 import * as d3 from "d3";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { createTheme, ThemeProvider, styled } from "@mui/material/styles";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
-
-const DatePickerContainer = styled('div')({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: '1rem',
-  flexWrap: 'wrap',
-});
 
 const DarkTextField = styled(TextField)({
   "& .MuiInputBase-root": {
@@ -133,73 +126,34 @@ const TableBarAnalysis = () => {
     }
   };
 
-  const renderTableHeaders = (data) => {
-    const keys = Object.keys(data[0]).filter(key => !key.endsWith(' (%)') && key !== 'month');
-    return (
-      <tr>
-        <th className="bg-dark text-white text-center">Month</th>
-        {keys.map(key => (
-          <th key={key} className="bg-dark text-white text-center">{key}</th>
-        ))}
-      </tr>
-    );
-  };
-
-  const renderTableRows = (data) => {
-    return data.map((row, index) => (
-      <tr key={index}>
-        <td className="bg-dark text-white text-center">
-          {d3.timeFormat("%B %Y")(new Date(row.month))}
-        </td>
-        {Object.keys(row).filter(key => !key.endsWith(' (%)') && key !== 'month').map(key => (
-          <td key={key} className="bg-dark text-white text-center">
-            {row[key]} ({row[key + ' (%)']}%)
-          </td>
-        ))}
-      </tr>
-    ));
-  };
-
-  const renderLineChartLines = (data) => {
-    const keys = Object.keys(data[0]).filter(key => key.endsWith(' (%)'));
-    const colors = [
-      '#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#387908', 
-      '#8e44ad', '#e74c3c', '#3498db', '#2ecc71', '#e67e22'
-    ];
-    return keys.map((key, index) => (
-      <Line key={key} type="monotone" dataKey={key} stroke={colors[index % colors.length]} strokeWidth={3} />
-    ));
-  };
-
   return (
     <MDBContainer>
-      <MDBRow className="align-items-center justify-content-center mb-4">
-        <MDBCol md="8" className="p-2">
-          <MDBCard className="bg-dark text-white">
-            <MDBCardBody>
-              <DatePickerContainer>
-                <ThemeProvider theme={darkTheme}>
-                  <LocalizationProvider dateAdapter={AdapterDateFns}>
-                    <DatePicker
-                      label="Start Date"
-                      value={startDate}
-                      onChange={(newValue) => setStartDate(newValue)}
-                      renderInput={(params) => <DarkTextField {...params} />}
-                    />
-                    <DatePicker
-                      label="End Date"
-                      value={endDate}
-                      onChange={(newValue) => setEndDate(newValue)}
-                      renderInput={(params) => <DarkTextField {...params} />}
-                    />
-                  </LocalizationProvider>
-                </ThemeProvider>
-                <MDBBtn color="light" onClick={fetchData} style={{ marginLeft: '10px' }}>
+      <MDBRow className="align-items-center justify-content-end">
+        <MDBCol md="6" className="p-2 d-flex justify-content-center">
+          <ThemeProvider theme={darkTheme}>
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <div
+                className="bg-dark text-white d-flex align-items-center"
+                style={{ gap: "8px" }}
+              >
+                <DatePicker
+                  label="Start Date"
+                  value={startDate}
+                  onChange={(newValue) => setStartDate(newValue)}
+                  renderInput={(params) => <DarkTextField {...params} />}
+                />
+                <DatePicker
+                  label="End Date"
+                  value={endDate}
+                  onChange={(newValue) => setEndDate(newValue)}
+                  renderInput={(params) => <DarkTextField {...params} />}
+                />
+                <MDBBtn color="light" onClick={fetchData}>
                   Fetch Data
                 </MDBBtn>
-              </DatePickerContainer>
-            </MDBCardBody>
-          </MDBCard>
+              </div>
+            </LocalizationProvider>
+          </ThemeProvider>
         </MDBCol>
       </MDBRow>
       <MDBRow>
@@ -211,10 +165,38 @@ const TableBarAnalysis = () => {
               </h4>
               <MDBTable responsive>
                 <MDBTableHead>
-                  {tableData.length > 0 && renderTableHeaders(tableData)}
+                  <tr>
+                    <th className="bg-dark text-white text-center">Month</th>
+                    <th className="bg-dark text-white text-center">Absent 5 P's Formulation</th>
+                    <th className="bg-dark text-white text-center">Limited 5 P's Formulation</th>
+                    <th className="bg-dark text-white text-center">Inclusive 5 P's Formulation</th>
+                    <th className="bg-dark text-white text-center">Limited Integrated Formulation</th>
+                    <th className="bg-dark text-white text-center">Inclusive Integrated Formulation</th>
+                  </tr>
                 </MDBTableHead>
                 <MDBTableBody>
-                  {renderTableRows(tableData)}
+                  {tableData.map((row, index) => (
+                    <tr key={index}>
+                      <td className="bg-dark text-white text-center">
+                        {d3.timeFormat("%B %Y")(new Date(row.month))}
+                      </td>
+                      <td className="bg-dark text-white text-center">
+                        {row["Absent 5 P's Formulation"]} ({row["Absent 5 P's Formulation (%)"]}%)
+                      </td>
+                      <td className="bg-dark text-white text-center">
+                        {row["Limited 5 P's Formulation"]} ({row["Limited 5 P's Formulation (%)"]}%)
+                      </td>
+                      <td className="bg-dark text-white text-center">
+                        {row["Inclusive 5 P's Formulation"]} ({row["Inclusive 5 P's Formulation (%)"]}%)
+                      </td>
+                      <td className="bg-dark text-white text-center">
+                        {row["Limited Integrated Formulation"]} ({row["Limited Integrated Formulation (%)"]}%)
+                      </td>
+                      <td className="bg-dark text-white text-center">
+                        {row["Inclusive Integrated Formulation"]} ({row["Inclusive Integrated Formulation (%)"]}%)
+                      </td>
+                    </tr>
+                  ))}
                 </MDBTableBody>
               </MDBTable>
             </MDBCardBody>
@@ -237,8 +219,12 @@ const TableBarAnalysis = () => {
                   <Label value="Percentage" angle={-90} position="insideLeft" offset={0} />
                 </YAxis>
                 <Tooltip labelFormatter={d3.timeFormat("%B %d, %Y")} />
-                <Legend wrapperStyle={{ paddingTop: 20 }} />
-                {lineData.length > 0 && renderLineChartLines(lineData)}
+                <Legend />
+                <Line type="monotone" dataKey="Absent 5 P's Formulation (%)" stroke="#8884d8" />
+                <Line type="monotone" dataKey="Limited 5 P's Formulation (%)" stroke="#82ca9d" />
+                <Line type="monotone" dataKey="Inclusive 5 P's Formulation (%)" stroke="#ffc658" />
+                <Line type="monotone" dataKey="Limited Integrated Formulation (%)" stroke="#ff7300" />
+                <Line type="monotone" dataKey="Inclusive Integrated Formulation (%)" stroke="#387908" />
               </LineChart>
             </ResponsiveContainer>
           </MDBCardBody>
