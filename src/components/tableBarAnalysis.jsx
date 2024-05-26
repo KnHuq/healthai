@@ -14,6 +14,8 @@ import dayjs from "dayjs";
 import FormulationBar from "./formulationBar";
 import FormulationTable from "./formulationTable";
 import FormulationLine from "./formulationLine";
+import FormulationLineChart2 from "./firmukationLineChart2";
+import FormulationBarChart2 from "./FormulatedBarChart2";
 
 const TableBarAnalysis = () => {
   return (
@@ -28,8 +30,8 @@ const TableBarAnalysis = () => {
       >
         <div> <MiniDrawer/> </div>
         <div> <FormulationTable/>  </div>
-        <div>  <FormulationBar/> </div>
-        <div> <FormulationLine/> </div>
+        <div>  <FormulationBarChart2/> </div>
+        <div> <FormulationLineChart2/> </div>
 
           
        
