@@ -84,9 +84,9 @@ def get_grouping_label(formulation_match_stat_dict, use_first_order = True, use_
         if integrated == 0:
             return "Inclusive 5 P's Formulation", "Absent Integrated Formulation", all_key_words
         if integrated <= 3:
-            return "inclusive 5 p's formulation", "Limited Integrated Formulation", all_key_words
+            return "Inclusive 5 P's Formulation", "Limited Integrated Formulation", all_key_words
         elif integrated >=4:
-            return "inclusive 5 p's formulation", "Inclusive Integrated Formulation", all_key_words
+            return "Inclusive 5 P's Formulation", "Inclusive Integrated Formulation", all_key_words
     
 def get_formulation_label(text):
     text = str(text.lower().strip())

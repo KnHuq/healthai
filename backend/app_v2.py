@@ -47,11 +47,17 @@ def get_formulationline_data():
     for k, v in final_dict.items():
         d = {
             "month": k,
+            "Limited Integrated Formulation":0,
+            "Inclusive Integrated Formulation":0,
+            "Limited 5 P's Formulation":0,
+            "Absent 5 P's Formulation":0,
+            "Inclusive 5 P's Formulation":0,
+
         }
         total = sum([v for k,v in v.items()])
         d.update({k: round((v/total)*100,2) for k, v in v.items()})
         data.append(d)
-
+    print (data)
     return jsonify(data)
 
 
