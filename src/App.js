@@ -16,9 +16,11 @@ function App() {
         <Route path="/welcome" element={<WelcomePage />} />
         <Route path="/admin-auth" element={<AdminAuthPage />} />
         <Route path="/register" element={<RegistrationForm />} />
-        <Route path="/analysis" element={<Analysis />} />
+        {/* <Route path="/analysis" element={<Analysis />} /> */}
         <Route path="/textinput" element={<TextDisplayFeaturePage />} />
-        <Route path="/tablebar" element={<TableBarAnalysis />} />
+
+        <Route path="/analysis" element={<TableBarAnalysis />} />
+
       </Routes>
     </Router>
   );
