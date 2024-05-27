@@ -70,8 +70,8 @@ protective_factors = {
 
 multiple_factors = {
     "first_order": {
-        "exact": ["history", "background", "trigger", "hx"],
-        "prefix": []
+        "exact": ["background", "trigger", "hx"],
+        "prefix": ["histor"]
     },
     "second_order": {
         "exact": ["substance", "abuse", "stressors", "support", "experience"],

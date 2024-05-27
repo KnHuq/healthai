@@ -68,7 +68,10 @@ def get_grouping_label(formulation_match_stat_dict, use_first_order = True, use_
             for k2,v2 in v[order].items():
                 total_count += len(v2.keys())
                 if len(v2.keys()) > 0:
+                    # if k != 'multiple':
+                    print ("WARNING!!! Multiple order is not implemented yet")
                     all_key_words += list(v2.keys())
+
         new_stat_dict[k] = total_count
 
     
