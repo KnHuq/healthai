@@ -255,45 +255,38 @@ const TableBarAnalysis = () => {
 
   return (
     <MDBContainer>
-      <MDBRow>
-        <MDBCol md="3">
-          <MiniDrawer /> {/* Include Sidebar here */}
-        </MDBCol>
-        <MDBCol md="8">
-          <MDBRow className="align-items-center justify-content-center mb-4">
-            <MDBCol md="12" className="p-2">
-              <MDBCard className="bg-dark text-white">
-                <MDBCardBody>
-                  <DatePickerContainer>
-                    <ThemeProvider theme={darkTheme}>
-                      <LocalizationProvider dateAdapter={AdapterDateFns}>
-                        <DatePicker
-                          label="Start Date"
-                          value={startDate}
-                          onChange={(newValue) => setStartDate(newValue)}
-                          renderInput={(params) => <DarkTextField {...params} />}
-                        />
-                        <DatePicker
-                          label="End Date"
-                          value={endDate}
-                          onChange={(newValue) => setEndDate(newValue)}
-                          renderInput={(params) => <DarkTextField {...params} />}
-                        />
-                      </LocalizationProvider>
-                    </ThemeProvider>
-                    <MDBBtn color="light" onClick={fetchData} style={{ marginLeft: '10px' }}>
-                      Fetch Data
-                    </MDBBtn>
-                  </DatePickerContainer>
-                </MDBCardBody>
-              </MDBCard>
-            </MDBCol>
-          </MDBRow>
-          {datasets.map((dataset, index) => (
-            <DataVisualization key={index} title={dataset.title} data={dataset.data} />
-          ))}
+      <MDBRow className="align-items-center justify-content-center mb-4">
+        <MDBCol md="8" className="p-2">
+          <MDBCard className="bg-dark text-white">
+            <MDBCardBody>
+              <DatePickerContainer>
+                <ThemeProvider theme={darkTheme}>
+                  <LocalizationProvider dateAdapter={AdapterDateFns}>
+                    <DatePicker
+                      label="Start Date"
+                      value={startDate}
+                      onChange={(newValue) => setStartDate(newValue)}
+                      renderInput={(params) => <DarkTextField {...params} />}
+                    />
+                    <DatePicker
+                      label="End Date"
+                      value={endDate}
+                      onChange={(newValue) => setEndDate(newValue)}
+                      renderInput={(params) => <DarkTextField {...params} />}
+                    />
+                  </LocalizationProvider>
+                </ThemeProvider>
+                <MDBBtn color="light" onClick={fetchData} style={{ marginLeft: '10px' }}>
+                  Fetch Data
+                </MDBBtn>
+              </DatePickerContainer>
+            </MDBCardBody>
+          </MDBCard>
         </MDBCol>
       </MDBRow>
+      {datasets.map((dataset, index) => (
+        <DataVisualization key={index} title={dataset.title} data={dataset.data} />
+      ))}
     </MDBContainer>
   );
 };
