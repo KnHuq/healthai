@@ -5,7 +5,7 @@ import pandas as pd
 from lib.formula_cal import get_formulation_label, get_grouping_label
 from collections import Counter
 from functools import reduce
-from fuzzywuzzy import process
+from fuzzywuzzy import process,fuzz
 from config.formula import (
     integrated_formulations,
     presentation_factors,
@@ -20,8 +20,8 @@ from config.formula import (
 app = Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
 
-DATA = "/Users/kazinazmulhaque/work/QH/data/data.csv"
-#DATA = "/home/asus/Downloads/data.csv"
+#DATA = "/Users/kazinazmulhaque/work/QH/data/data.csv"
+DATA = "/home/asus/Downloads/data.csv"
 DATA_DF = pd.read_csv(DATA)
 DATA_DF["eventdate"] = pd.to_datetime(DATA_DF["eventdate"])
 
@@ -307,52 +307,42 @@ def formulationtable_data():
 
 @app.route("/match-words", methods=["POST"])
 def match_words():
-    print('function called')
+    print('Function called')
     data = request.json
     text = data.get("text", "").lower().strip()
-    print('text: ', text)
+    print('Text:', text)
     matches = []
 
     # Define a threshold for fuzzy matching
-    threshold = 50
+    threshold = 80
+
+    words = text.split()  # Split the text into individual words
 
     for category, levels in CATEGORIES.items():
         for level, types in levels.items():
             for match_type, keywords in types.items():
                 for keyword in keywords:
-                    start = 0  # Start from the beginning of the text
-                    while start < len(text):
-                        # Find the keyword starting from 'start' using fuzzy matching
-                        segment = text[start:]
-                        best_match, score = process.extractOne(segment, [keyword])
-                        print('Best Match: ', best_match, 'Score: ', score)
+                    for i, word in enumerate(words):
+                        score = fuzz.ratio(keyword, word)
+                        print('Keyword:', keyword, 'Word:', word, 'Score:', score)
 
-                        if score < threshold:
-                            print('score: ', score, ',threshold: ', threshold)
-                            print('score is lower than threshold')
-                            break
+                        if score >= threshold:
+                            # Calculate the start and end positions in the original text
+                            start = text.find(word)
+                            end = start + len(word)
 
-                        index = segment.find(best_match)
-                        if index == -1:
-                            break
-
-                        start += index
-                        # Add the match with the current start and end indices
-                        matches.append(
-                            {
+                            # Append match details to the matches list
+                            matches.append({
                                 "category": category,
                                 "level": level,
                                 "type": match_type,
                                 "keyword": keyword,
                                 "start": start,
-                                "end": start + len(best_match),
-                            }
-                        )
-                        print(matches)
-                        start += len(
-                            best_match
-                        )  # Move past the current match to find subsequent matches
+                                "end": end,
+                            })
+                            print('Matches:', matches)
 
+    print('Final Matches:', matches)  # Add this line to verify the structure of the matches
     return jsonify({"matches": matches})
 
 
