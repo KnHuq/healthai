@@ -1,40 +1,31 @@
 import React, { useEffect, useState } from "react";
-import { MDBRow, MDBCard, MDBCardBody,  MDBTable, MDBTableHead, MDBTableBody } from "mdb-react-ui-kit";
+import {
+  MDBRow,
+  MDBCard,
+  MDBCardBody,
+  MDBTable,
+  MDBTableHead,
+  MDBTableBody,
+} from "mdb-react-ui-kit";
 
 const DisplayTextTable = ({ highlightedwords }) => {
   const [categoriesWithWords, setCategoriesWithWords] = useState({});
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const wordCategories = await Promise.all(
-          highlightedwords.map(async (word) => {
-            const response = await fetch(
-              `http://localhost:5000/category?word=${word}`
-            );
-            const data = await response.json();
-            return { word, category: data.category };
-          })
-        );
-
-        const updatedCategories = wordCategories.reduce(
-          (acc, { word, category }) => {
-            acc[category] = acc[category] ? [...acc[category], word] : [word];
-            return acc;
-          },
-          {}
-        );
-
-        setCategoriesWithWords(updatedCategories);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
+    const groupWordsByCategories = () => {
+      const grouped = highlightedwords.reduce((acc, { word, category }) => {
+        if (!acc[category]) {
+          acc[category] = [];
+        }
+        acc[category].push(word);
+        return acc;
+      }, {});
+      setCategoriesWithWords(grouped);
     };
 
     if (highlightedwords && highlightedwords.length > 0) {
-      fetchCategories();
+      groupWordsByCategories();
     } else {
-      // Ensure the state is cleared when there are no highlighted words.
       setCategoriesWithWords({});
     }
   }, [highlightedwords]);
@@ -50,30 +41,31 @@ const DisplayTextTable = ({ highlightedwords }) => {
         }}
       >
         <MDBCardBody className="d-flex flex-column align-items-center mx-auto w-100">
-          <h2 className="fw-bold mb-2 text-uppercase Text-center">
+          <h2 className="fw-bold mb-2 text-uppercase text-center">
             Highlighted Text and Categories
           </h2>
           <br />
-          <MDBTable bordered borderColor="primary" style={{ color: "white" }}>
-            <MDBTableHead>
-              <tr>
-                <th scope='col-xl'>Category</th>
-                <th scope='col-xl'>Words</th>
-              </tr>
-            </MDBTableHead>
-            <MDBTableBody>
-              {Object.entries(categoriesWithWords).map(
-                ([category, words], index) => (
-                  <tr key={index}>
-                    <td>{category}</td>
-                    <td>{words.join(", ")}</td>
-                  </tr>
-                )
-              )}
-            </MDBTableBody>
-          </MDBTable>
-          {Object.keys(categoriesWithWords).length === 0 && (
+          {Object.keys(categoriesWithWords).length === 0 ? (
             <p className="text-white-50 mb-3">No highlighted text.</p>
+          ) : (
+            <MDBTable bordered borderColor="primary" style={{ color: "white" }}>
+              <MDBTableHead>
+                <tr>
+                  <th scope="col-xl">Category</th>
+                  <th scope="col-xl">Words</th>
+                </tr>
+              </MDBTableHead>
+              <MDBTableBody>
+                {Object.entries(categoriesWithWords).map(
+                  ([category, words], index) => (
+                    <tr key={index}>
+                      <td>{category}</td>
+                      <td>{words.join(", ")}</td>
+                    </tr>
+                  )
+                )}
+              </MDBTableBody>
+            </MDBTable>
           )}
         </MDBCardBody>
       </MDBCard>

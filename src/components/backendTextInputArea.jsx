@@ -1,6 +1,6 @@
 import React from "react";
 import { Editor, EditorState, CompositeDecorator } from "draft-js";
-import { MDBCard, MDBCardBody, MDBRow } from "mdb-react-ui-kit";
+import { MDBCard, MDBCardBody, MDBRow, MDBContainer } from "mdb-react-ui-kit";
 import "draft-js/dist/Draft.css";
 import axios from "axios"; // Ensure axios is installed for HTTP requests
 
@@ -11,9 +11,10 @@ import axios from "axios"; // Ensure axios is installed for HTTP requests
  */
 const getMatchedWordsFromBackend = async (text) => {
   try {
-    const response = await axios.post("http://localhost:5000/match-words", {
+    const response = await axios.post("http://localhost:8080/match-words", {
       text,
     });
+    console.log('text: ', text)
     // Assumes the backend returns an object with a 'matches' array
     return response.data.matches;
   } catch (error) {
@@ -58,10 +59,13 @@ class BackendTextInputArea extends React.Component {
    */
   updateMatches = async () => {
     const text = this.state.editorState.getCurrentContent().getPlainText();
+
     const matches = await getMatchedWordsFromBackend(text);
-    const highlightedwords = matches.map((match) =>
-      text.slice(match.start, match.end)
-    ); // Extract words from text based on match indices
+    const highlightedwords = matches.map((match) => ({
+      //text.slice(match.start, match.end),
+      word: text.slice(match.start, match.end),
+      category: match.category,
+    })); // Extract words from text based on match indices
     this.setState({ matches }, () => {
       this.refreshEditor();
       this.props.onHighlightUpdate(highlightedwords); // Call the callback with the highlighted words
@@ -150,10 +154,10 @@ class BackendTextInputArea extends React.Component {
 const Highlight = (props) => (
   <span
     style={{
-      fontWeight: "bold",
-      textDecoration: "underline",
-      backgroundColor: "#2575fc",
-      color: "white",
+      //fontWeight: "bold",
+      textDecoration: "blue underline",
+      //backgroundColor: "#2575fc",
+      //color: "white",
     }}
   >
     {props.children}
