@@ -42,7 +42,7 @@ const DisplayTextTable = ({ highlightedwords }) => {
       >
         <MDBCardBody className="d-flex flex-column align-items-center mx-auto w-100">
           <h2 className="fw-bold mb-2 text-uppercase text-center">
-            Highlighted Text and Categories
+            Highlighted Text and Catagories
           </h2>
           <br />
           {Object.keys(categoriesWithWords).length === 0 ? (

@@ -155,7 +155,9 @@ const Highlight = (props) => (
   <span
     style={{
       //fontWeight: "bold",
-      textDecoration: "blue underline",
+      textDecoration: "underline",
+      textDecorationColor: "#00FF00",
+      textDecorationThickness: "0.20em"
       //backgroundColor: "#2575fc",
       //color: "white",
     }}

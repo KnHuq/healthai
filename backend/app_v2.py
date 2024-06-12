@@ -27,13 +27,13 @@ DATA_DF["eventdate"] = pd.to_datetime(DATA_DF["eventdate"])
 
 
 CATEGORIES = {
-    "integrated_formulations": integrated_formulations,
-    "presentation_factors": presentation_factors,
-    "precipitating_factors": precipitating_factors,
-    "predisposing_factors": predisposing_factors,
-    "perpetuating_factors": perpetuating_factors,
-    "protective_factors": protective_factors,
-    "multiple_factors": multiple_factors,
+    "Integrated Formulations": integrated_formulations,
+    "Presentation Factors": presentation_factors,
+    "Precipitating Factors": precipitating_factors,
+    "Predisposing Factors": predisposing_factors,
+    "Perpetuating Factors": perpetuating_factors,
+    "Protective Factors": protective_factors,
+    "Multiple Factors": multiple_factors,
 }
 
 
@@ -307,10 +307,10 @@ def formulationtable_data():
 
 @app.route("/match-words", methods=["POST"])
 def match_words():
-    print('Function called')
+    
     data = request.json
     text = data.get("text", "").lower().strip()
-    print('Text:', text)
+    
     matches = []
 
     # Define a threshold for fuzzy matching
@@ -324,7 +324,7 @@ def match_words():
                 for keyword in keywords:
                     for i, word in enumerate(words):
                         score = fuzz.ratio(keyword, word)
-                        print('Keyword:', keyword, 'Word:', word, 'Score:', score)
+                        
 
                         if score >= threshold:
                             # Calculate the start and end positions in the original text
@@ -342,7 +342,7 @@ def match_words():
                             })
                             print('Matches:', matches)
 
-    print('Final Matches:', matches)  # Add this line to verify the structure of the matches
+    
     return jsonify({"matches": matches})
 
 
