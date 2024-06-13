@@ -346,6 +346,22 @@ def match_words():
     return jsonify({"matches": matches})
 
 
+
+
+
+@app.route('/categories', methods=['GET'])
+def get_categories():
+    return jsonify({"categories": CATEGORIES})
+
+
+
+
+
+
+
+
+
+
 # @app.route('/api/formulationtable_data', methods=['GET'])
 # def get_formulationtable_data():
 #     print('table data is callled')
