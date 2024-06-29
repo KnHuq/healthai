@@ -103,7 +103,7 @@ table_data = [
 #     return jsonify(response_data)
 
 
-@app.route("/api/formulation_data")
+@app.route("/api/formulation_data", methods=['GET'])
 def formulationtable_data():
     print ('formulationtable_data is called.....')
     global DATA_DF
@@ -346,4 +346,5 @@ def formulationtable_data():
 
 
 if __name__ == "__main__":
-    app.run(port=8080)
+    # add ip of 0.0.0.0 and port of 8080
+    app.run(port=8080, debug=True)

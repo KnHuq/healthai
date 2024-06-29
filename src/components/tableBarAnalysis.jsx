@@ -235,13 +235,39 @@ const TableBarAnalysis = () => {
   const [startDate, setStartDate] = useState(new Date('2018-03-15'));
   const [endDate, setEndDate] = useState(new Date('2018-07-15'));
 
+  // const fetchData = async () => {
+  //   const start = startDate.toISOString().split("T")[0];
+  //   const end = endDate.toISOString().split("T")[0];
+  //   const url = `http://localhost:8080/api/formulation_data?start_date=${start}&end_date=${end}`;
+    
+  //   try {
+  //     const response = await fetch(url);
+  //     if (!response.ok) {
+  //       throw new Error("Network response was not ok");
+  //     }
+  //     const jsonData = await response.json();
+  //     setDatasets(jsonData);
+  //   } catch (error) {
+  //     console.error("Failed to fetch data:", error);
+  //   }
+  // };
+
   const fetchData = async () => {
     const start = startDate.toISOString().split("T")[0];
     const end = endDate.toISOString().split("T")[0];
-    const url = `http://localhost:8080/api/formulation_data?start_date=${start}&end_date=${end}`;
-    
+    const url = `https://capable-lamprey-widely.ngrok-free.app/api/formulation_data?start_date=${start}&end_date=${end}`;
+  
+    const headers = new Headers();
+    headers.append('ngrok-skip-browser-warning', 'true');
+  
+    const requestOptions = {
+      method: 'GET', // or 'POST' if your API endpoint requires POST
+      headers: headers,
+      // You can add more options like body for POST requests
+    };
+  
     try {
-      const response = await fetch(url);
+      const response = await fetch(url, requestOptions);
       if (!response.ok) {
         throw new Error("Network response was not ok");
       }
@@ -251,6 +277,9 @@ const TableBarAnalysis = () => {
       console.error("Failed to fetch data:", error);
     }
   };
+  
+
+
 
   return (
     <MDBContainer>
