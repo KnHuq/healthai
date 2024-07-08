@@ -294,7 +294,7 @@ const TableBarAnalysis = () => {
   const [datasets, setDatasets] = useState([]);
   const [startDate, setStartDate] = useState(new Date("2018-03-15"));
   const [endDate, setEndDate] = useState(new Date("2018-07-15"));
-  const [selectedOption, setSelectedOption] = useState("Option 1");
+  const [selectedOption, setSelectedOption] = useState("All Templates");
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   const toggleDropdown = () => setDropdownOpen((prev) => !prev);
@@ -357,11 +357,33 @@ const TableBarAnalysis = () => {
                     {selectedOption}
                   </MDBDropdownToggle>
                   <MDBDropdownMenu>
-                    <CustomDropdownItem onClick={() => handleOptionSelect("Option 1")}>
-                      Option 1
+                  
+                    <CustomDropdownItem onClick={() => handleOptionSelect("All Templates")}>
+                    All Templates
                     </CustomDropdownItem>
-                    <CustomDropdownItem onClick={() => handleOptionSelect("Option 2")}>
-                      Option 2
+                    <CustomDropdownItem onClick={() => handleOptionSelect("Case Review")}>
+                    Case Review
+                    </CustomDropdownItem>
+                    <CustomDropdownItem onClick={() => handleOptionSelect("Transfer of Care")}>
+                    Transfer of Care
+                    </CustomDropdownItem>
+                    <CustomDropdownItem onClick={() => handleOptionSelect("Longitudinal Summary")}>
+                    Longitudinal Summary
+                    </CustomDropdownItem>
+                    <CustomDropdownItem onClick={() => handleOptionSelect("Focused Assessment plus Substance Use")}>
+                    Focused Assessment plus Substance Use
+                    </CustomDropdownItem>
+                    <CustomDropdownItem onClick={() => handleOptionSelect("Child and Youth Mental Health Assessment")}>
+                    Child and Youth Mental Health Assessment
+                    </CustomDropdownItem>
+                    <CustomDropdownItem onClick={() => handleOptionSelect("Focused Assessment")}>
+                    Focused Assessment
+                    </CustomDropdownItem>
+                    <CustomDropdownItem onClick={() => handleOptionSelect("Comprehensive Assessment")}>
+                    Comprehensive Assessment
+                    </CustomDropdownItem>
+                    <CustomDropdownItem onClick={() => handleOptionSelect("Forensic Comprehensive Assessment")}>
+                    Forensic Comprehensive Assessment
                     </CustomDropdownItem>
                   </MDBDropdownMenu>
                 </MDBDropdown>

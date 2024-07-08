@@ -110,11 +110,15 @@ def formulationtable_data():
     # Extract start_date and end_date from query parameters
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")
+    selected_template = request.args.get("option")
+    # filter Template according to the option
     start_date = pd.to_datetime(start_date, format="%Y-%m-%d", errors='coerce')
     end_date = pd.to_datetime(end_date, format="%Y-%m-%d", errors='coerce')
-
     # filter the data
     filtered_data = DATA_DF[(DATA_DF['eventdate'] >= start_date) & (DATA_DF['eventdate'] <= end_date)]
+    if selected_template != "All Templates":
+        filtered_data = filtered_data[filtered_data["Template"] == selected_template]
+        
     filtered_data.sort_values(by='eventdate', ascending=True, inplace=True)
     if filtered_data.empty:
         return jsonify([])
