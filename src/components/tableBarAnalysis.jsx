@@ -9,6 +9,10 @@ import {
   MDBTable,
   MDBTableBody,
   MDBTableHead,
+  MDBDropdown,
+  MDBDropdownToggle,
+  MDBDropdownMenu,
+  MDBDropdownItem,
 } from "mdb-react-ui-kit";
 import {
   LineChart,
@@ -24,18 +28,19 @@ import {
 import * as d3 from "d3";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import { createTheme, ThemeProvider, styled } from "@mui/material/styles";
+import { createTheme, ThemeProvider, styled as muiStyled } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
+import styled from "styled-components";
 
-const DatePickerContainer = styled('div')({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: '1rem',
-  flexWrap: 'wrap',
+const DatePickerContainer = muiStyled("div")({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: "1rem",
+  flexWrap: "wrap",
 });
 
-const DarkTextField = styled(TextField)({
+const DarkTextField = muiStyled(TextField)({
   "& .MuiInputBase-root": {
     color: "white",
     backgroundColor: "#212529",
@@ -101,9 +106,35 @@ const darkTheme = createTheme({
 });
 
 const colors = [
-  '#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#387908', 
-  '#8e44ad', '#e74c3c', '#3498db', '#2ecc71', '#e67e22'
+  "#8884d8",
+  "#82ca9d",
+  "#ffc658",
+  "#ff7300",
+  "#387908",
+  "#8e44ad",
+  "#e74c3c",
+  "#3498db",
+  "#2ecc71",
+  "#e67e22",
 ];
+
+const CustomDropdownItem = styled(MDBDropdownItem)`
+  padding: 0.5rem 1rem;
+  color: white;
+  background-color: #0d6efd; /* Match button background color */
+  border: none;
+  border-radius: 0.25rem;
+  transition: all 0.3s ease;
+  margin: 0.25rem 0;
+  text-align: center;
+  
+  &:hover {
+    background-color: #0b5ed7; /* Darker shade on hover */
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(11, 94, 215, 0.5); /* Match button hover effect */
+  }
+`;
 
 const DataVisualization = ({ title, data }) => {
   const [selectedKeys, setSelectedKeys] = useState([]);
@@ -111,29 +142,31 @@ const DataVisualization = ({ title, data }) => {
   useEffect(() => {
     // Preselect top 5 keys based on the total value over all months
     const keysWithTotals = Object.keys(data[0])
-      .filter(key => key.endsWith(' (%)'))
-      .map(key => {
+      .filter((key) => key.endsWith(" (%)"))
+      .map((key) => {
         const total = data.reduce((sum, item) => sum + (item[key] || 0), 0);
         return { key, total };
       })
       .sort((a, b) => b.total - a.total)
       .slice(0, 5)
-      .map(item => item.key);
+      .map((item) => item.key);
 
     setSelectedKeys(keysWithTotals);
   }, [data]);
 
   const handleCheckboxChange = (key) => {
-    setSelectedKeys(prevKeys =>
-      prevKeys.includes(key) ? prevKeys.filter(k => k !== key) : [...prevKeys, key]
+    setSelectedKeys((prevKeys) =>
+      prevKeys.includes(key)
+        ? prevKeys.filter((k) => k !== key)
+        : [...prevKeys, key]
     );
   };
 
   const renderCheckboxes = () => {
-    const keys = Object.keys(data[0]).filter(key => key.endsWith(' (%)'));
+    const keys = Object.keys(data[0]).filter((key) => key.endsWith(" (%)"));
     return (
       <div className="d-flex justify-content-center flex-wrap mb-3">
-        {keys.map(key => (
+        {keys.map((key) => (
           <div key={key} className="form-check form-check-inline text-white">
             <input
               className="form-check-input"
@@ -143,7 +176,7 @@ const DataVisualization = ({ title, data }) => {
               onChange={() => handleCheckboxChange(key)}
             />
             <label className="form-check-label" htmlFor={key}>
-              {key.replace(' (%)', '')}
+              {key.replace(" (%)", "")}
             </label>
           </div>
         ))}
@@ -152,12 +185,16 @@ const DataVisualization = ({ title, data }) => {
   };
 
   const renderTableHeaders = (data) => {
-    const keys = Object.keys(data[0]).filter(key => !key.endsWith(' (%)') && key !== 'month').sort();
+    const keys = Object.keys(data[0])
+      .filter((key) => !key.endsWith(" (%)") && key !== "month")
+      .sort();
     return (
       <tr>
         <th className="bg-dark text-white text-center">Month</th>
-        {keys.map(key => (
-          <th key={key} className="bg-dark text-white text-center">{key}</th>
+        {keys.map((key) => (
+          <th key={key} className="bg-dark text-white text-center">
+            {key}
+          </th>
         ))}
       </tr>
     );
@@ -165,15 +202,17 @@ const DataVisualization = ({ title, data }) => {
 
   const renderTableRows = (data) => {
     return data.map((row, index) => {
-      const keys = Object.keys(row).filter(key => !key.endsWith(' (%)') && key !== 'month').sort();
+      const keys = Object.keys(row)
+        .filter((key) => !key.endsWith(" (%)") && key !== "month")
+        .sort();
       return (
         <tr key={index}>
           <td className="bg-dark text-white text-center">
             {d3.timeFormat("%B %Y")(new Date(row.month))}
           </td>
-          {keys.map(key => (
+          {keys.map((key) => (
             <td key={key} className="bg-dark text-white text-center">
-              {row[key]} ({row[key + ' (%)']}%)
+              {row[key]} ({row[key + " (%)"]}%)
             </td>
           ))}
         </tr>
@@ -183,7 +222,13 @@ const DataVisualization = ({ title, data }) => {
 
   const renderLineChartLines = (data) => {
     return selectedKeys.map((key, index) => (
-      <Line key={key} type="monotone" dataKey={key} stroke={colors[index % colors.length]} strokeWidth={3} />
+      <Line
+        key={key}
+        type="monotone"
+        dataKey={key}
+        stroke={colors[index % colors.length]}
+        strokeWidth={3}
+      />
     ));
   };
 
@@ -192,18 +237,35 @@ const DataVisualization = ({ title, data }) => {
       <MDBCol md="12" className="p-2">
         <MDBCard className="bg-dark text-white my-3">
           <MDBCardBody>
-            <h4 className="bg-dark text-white text-center mb-4">{title} Line Chart</h4>
+            <h4 className="bg-dark text-white text-center mb-4">
+              {title} Line Chart
+            </h4>
             {renderCheckboxes()}
             <ResponsiveContainer width="100%" height={400}>
-              <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 30 }}>
+              <LineChart
+                data={data}
+                margin={{ top: 20, right: 30, left: 20, bottom: 30 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" tickFormatter={(tick) => d3.timeFormat("%b")(new Date(tick))}>
+                <XAxis
+                  dataKey="month"
+                  tickFormatter={(tick) => d3.timeFormat("%b")(new Date(tick))}
+                >
                   <Label value="Month" offset={-10} position="insideBottom" />
                 </XAxis>
                 <YAxis tickFormatter={(value) => `${value}%`}>
-                  <Label value="Percentage" angle={-90} position="insideLeft" offset={0} />
+                  <Label
+                    value="Percentage"
+                    angle={-90}
+                    position="insideLeft"
+                    offset={0}
+                  />
                 </YAxis>
-                <Tooltip labelFormatter={(label) => d3.timeFormat("%B %d, %Y")(new Date(label))} />
+                <Tooltip
+                  labelFormatter={(label) =>
+                    d3.timeFormat("%B %d, %Y")(new Date(label))
+                  }
+                />
                 <Legend wrapperStyle={{ paddingTop: 20 }} />
                 {data.length > 0 && renderLineChartLines(data)}
               </LineChart>
@@ -219,9 +281,7 @@ const DataVisualization = ({ title, data }) => {
               <MDBTableHead>
                 {data.length > 0 && renderTableHeaders(data)}
               </MDBTableHead>
-              <MDBTableBody>
-                {renderTableRows(data)}
-              </MDBTableBody>
+              <MDBTableBody>{renderTableRows(data)}</MDBTableBody>
             </MDBTable>
           </MDBCardBody>
         </MDBCard>
@@ -232,40 +292,31 @@ const DataVisualization = ({ title, data }) => {
 
 const TableBarAnalysis = () => {
   const [datasets, setDatasets] = useState([]);
-  const [startDate, setStartDate] = useState(new Date('2018-03-15'));
-  const [endDate, setEndDate] = useState(new Date('2018-07-15'));
+  const [startDate, setStartDate] = useState(new Date("2018-03-15"));
+  const [endDate, setEndDate] = useState(new Date("2018-07-15"));
+  const [selectedOption, setSelectedOption] = useState("Option 1");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  // const fetchData = async () => {
-  //   const start = startDate.toISOString().split("T")[0];
-  //   const end = endDate.toISOString().split("T")[0];
-  //   const url = `http://localhost:8080/api/formulation_data?start_date=${start}&end_date=${end}`;
-    
-  //   try {
-  //     const response = await fetch(url);
-  //     if (!response.ok) {
-  //       throw new Error("Network response was not ok");
-  //     }
-  //     const jsonData = await response.json();
-  //     setDatasets(jsonData);
-  //   } catch (error) {
-  //     console.error("Failed to fetch data:", error);
-  //   }
-  // };
+  const toggleDropdown = () => setDropdownOpen((prev) => !prev);
+
+  const handleOptionSelect = (option) => {
+    setSelectedOption(option);
+    setDropdownOpen(false);
+  };
 
   const fetchData = async () => {
     const start = startDate.toISOString().split("T")[0];
     const end = endDate.toISOString().split("T")[0];
-    const url = `https://capable-lamprey-widely.ngrok-free.app/api/formulation_data?start_date=${start}&end_date=${end}`;
-  
+    const url = `https://capable-lamprey-widely.ngrok-free.app/api/formulation_data?start_date=${start}&end_date=${end}&option=${selectedOption}`;
+
     const headers = new Headers();
-    headers.append('ngrok-skip-browser-warning', 'true');
-  
+    headers.append("ngrok-skip-browser-warning", "true");
+
     const requestOptions = {
-      method: 'GET', // or 'POST' if your API endpoint requires POST
+      method: "GET",
       headers: headers,
-      // You can add more options like body for POST requests
     };
-  
+
     try {
       const response = await fetch(url, requestOptions);
       if (!response.ok) {
@@ -277,9 +328,6 @@ const TableBarAnalysis = () => {
       console.error("Failed to fetch data:", error);
     }
   };
-  
-
-
 
   return (
     <MDBContainer>
@@ -304,7 +352,24 @@ const TableBarAnalysis = () => {
                     />
                   </LocalizationProvider>
                 </ThemeProvider>
-                <MDBBtn color="light" onClick={fetchData} style={{ marginLeft: '10px' }}>
+                <MDBDropdown isOpen={dropdownOpen} toggle={toggleDropdown}>
+                  <MDBDropdownToggle color="light" caret>
+                    {selectedOption}
+                  </MDBDropdownToggle>
+                  <MDBDropdownMenu>
+                    <CustomDropdownItem onClick={() => handleOptionSelect("Option 1")}>
+                      Option 1
+                    </CustomDropdownItem>
+                    <CustomDropdownItem onClick={() => handleOptionSelect("Option 2")}>
+                      Option 2
+                    </CustomDropdownItem>
+                  </MDBDropdownMenu>
+                </MDBDropdown>
+                <MDBBtn
+                  color="light"
+                  onClick={fetchData}
+                  style={{ marginLeft: "10px" }}
+                >
                   Fetch Data
                 </MDBBtn>
               </DatePickerContainer>
