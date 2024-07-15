@@ -103,6 +103,23 @@ table_data = [
 #     return jsonify(response_data)
 
 
+@app.route("/api/initial_state", methods=['GET'])
+def initial_state():
+    global DATA_DF
+
+    treating_unit = list(DATA_DF['TreatingUnitDesc'].unique()) 
+    tu_special_service_type = list(DATA_DF['TUSpecialServiceType'].unique())
+
+    response_data = {
+        "treating_unit": treating_unit,
+        "tu_special_service_type": tu_special_service_type
+    }
+
+    return jsonify(response_data)
+
+
+
+
 @app.route("/api/formulation_data", methods=['GET'])
 def formulationtable_data():
     print ('formulationtable_data is called.....')
@@ -110,15 +127,19 @@ def formulationtable_data():
     # Extract start_date and end_date from query parameters
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")
-    selected_template = request.args.get("option")
+    treating_unit = request.args.get("treating_unit")
+    tu_special_service_type = request.args.get("tu_special_service_type")
     # filter Template according to the option
     start_date = pd.to_datetime(start_date, format="%Y-%m-%d", errors='coerce')
     end_date = pd.to_datetime(end_date, format="%Y-%m-%d", errors='coerce')
     # filter the data
     filtered_data = DATA_DF[(DATA_DF['eventdate'] >= start_date) & (DATA_DF['eventdate'] <= end_date)]
-    if selected_template != "All Templates":
-        filtered_data = filtered_data[filtered_data["Template"] == selected_template]
-        
+
+    filtered_data = filtered_data[
+        (filtered_data['TreatingUnitDesc'] == "RAMHT") &
+        (filtered_data['TUSpecialServiceType'] == "Community Care Team")
+    ]
+
     filtered_data.sort_values(by='eventdate', ascending=True, inplace=True)
     if filtered_data.empty:
         return jsonify([])

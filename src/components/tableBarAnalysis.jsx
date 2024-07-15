@@ -9,10 +9,6 @@ import {
   MDBTable,
   MDBTableBody,
   MDBTableHead,
-  MDBDropdown,
-  MDBDropdownToggle,
-  MDBDropdownMenu,
-  MDBDropdownItem,
 } from "mdb-react-ui-kit";
 import {
   LineChart,
@@ -118,7 +114,7 @@ const colors = [
   "#e67e22",
 ];
 
-const CustomDropdownItem = styled(MDBDropdownItem)`
+const CustomDropdownItem = styled.div`
   padding: 0.5rem 1rem;
   color: white;
   background-color: #0d6efd; /* Match button background color */
@@ -290,24 +286,89 @@ const DataVisualization = ({ title, data }) => {
   );
 };
 
+const DropdownSearch = ({ label, searchTerm, setSearchTerm, selectedOption, setSelectedOption, options }) => {
+  const [filteredOptions, setFilteredOptions] = useState([]);
+
+  useEffect(() => {
+    setFilteredOptions(
+      options.filter((option) =>
+        option.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    );
+  }, [searchTerm, options]);
+
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const handleSelect = (option) => {
+    setSelectedOption(option);
+    setSearchTerm("");
+  };
+
+  return (
+    <div className="p-2">
+      <DarkTextField
+        label={label}
+        value={searchTerm}
+        onChange={handleSearchChange}
+        style={{ width: "100%" }}
+      />
+      {searchTerm && filteredOptions.map((option, index) => (
+        <CustomDropdownItem
+          key={index}
+          onClick={() => handleSelect(option)}
+        >
+          {option}
+        </CustomDropdownItem>
+      ))}
+    </div>
+  );
+};
+
 const TableBarAnalysis = () => {
   const [datasets, setDatasets] = useState([]);
   const [startDate, setStartDate] = useState(new Date("2018-03-15"));
   const [endDate, setEndDate] = useState(new Date("2018-07-15"));
-  const [selectedOption, setSelectedOption] = useState("All Templates");
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [treatingUnitSearchTerm, setTreatingUnitSearchTerm] = useState("");
+  const [selectedTreatingUnit, setSelectedTreatingUnit] = useState("");
+  const [treatingUnitOptions, setTreatingUnitOptions] = useState([]);
+  const [tuSpecialServiceTypeSearchTerm, setTuSpecialServiceTypeSearchTerm] = useState("");
+  const [selectedTuSpecialServiceType, setSelectedTuSpecialServiceType] = useState("");
+  const [tuSpecialServiceTypeOptions, setTuSpecialServiceTypeOptions] = useState([]);
 
-  const toggleDropdown = () => setDropdownOpen((prev) => !prev);
+  useEffect(() => {
+    const fetchInitialState = async () => {
+      const url = "https://capable-lamprey-widely.ngrok-free.app/api/initial_state";
 
-  const handleOptionSelect = (option) => {
-    setSelectedOption(option);
-    setDropdownOpen(false);
-  };
+      const headers = new Headers();
+      headers.append("ngrok-skip-browser-warning", "true");
+
+      const requestOptions = {
+        method: "GET",
+        headers: headers,
+      };
+
+      try {
+        const response = await fetch(url, requestOptions);
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const jsonData = await response.json();
+        setTreatingUnitOptions(jsonData.treating_unit);
+        setTuSpecialServiceTypeOptions(jsonData.tu_special_service_type);
+      } catch (error) {
+        console.error("Failed to fetch initial state:", error);
+      }
+    };
+
+    fetchInitialState();
+  }, []);
 
   const fetchData = async () => {
     const start = startDate.toISOString().split("T")[0];
     const end = endDate.toISOString().split("T")[0];
-    const url = `https://capable-lamprey-widely.ngrok-free.app/api/formulation_data?start_date=${start}&end_date=${end}&option=${selectedOption}`;
+    const url = `https://capable-lamprey-widely.ngrok-free.app/api/formulation_data?start_date=${start}&end_date=${end}&treating_unit=${selectedTreatingUnit}&tu_special_service_type=${selectedTuSpecialServiceType}`;
 
     const headers = new Headers();
     headers.append("ngrok-skip-browser-warning", "true");
@@ -335,6 +396,24 @@ const TableBarAnalysis = () => {
         <MDBCol md="8" className="p-2">
           <MDBCard className="bg-dark text-white">
             <MDBCardBody>
+              <DropdownSearch
+                label="Search Treating Unit"
+                searchTerm={treatingUnitSearchTerm}
+                setSearchTerm={setTreatingUnitSearchTerm}
+                selectedOption={selectedTreatingUnit}
+                setSelectedOption={setSelectedTreatingUnit}
+                options={treatingUnitOptions}
+              />
+              {selectedTreatingUnit && <p className="mt-2">Selected Treating Unit: {selectedTreatingUnit}</p>}
+              <DropdownSearch
+                label="Search Special Service Type"
+                searchTerm={tuSpecialServiceTypeSearchTerm}
+                setSearchTerm={setTuSpecialServiceTypeSearchTerm}
+                selectedOption={selectedTuSpecialServiceType}
+                setSelectedOption={setSelectedTuSpecialServiceType}
+                options={tuSpecialServiceTypeOptions}
+              />
+              {selectedTuSpecialServiceType && <p className="mt-2">Selected Special Service Type: {selectedTuSpecialServiceType}</p>}
               <DatePickerContainer>
                 <ThemeProvider theme={darkTheme}>
                   <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -352,49 +431,12 @@ const TableBarAnalysis = () => {
                     />
                   </LocalizationProvider>
                 </ThemeProvider>
-                <MDBDropdown isOpen={dropdownOpen} toggle={toggleDropdown}>
-                  <MDBDropdownToggle color="light" caret>
-                    {selectedOption}
-                  </MDBDropdownToggle>
-                  <MDBDropdownMenu>
-                  
-                    <CustomDropdownItem onClick={() => handleOptionSelect("All Templates")}>
-                    All Templates
-                    </CustomDropdownItem>
-                    <CustomDropdownItem onClick={() => handleOptionSelect("Case Review")}>
-                    Case Review
-                    </CustomDropdownItem>
-                    <CustomDropdownItem onClick={() => handleOptionSelect("Transfer of Care")}>
-                    Transfer of Care
-                    </CustomDropdownItem>
-                    <CustomDropdownItem onClick={() => handleOptionSelect("Longitudinal Summary")}>
-                    Longitudinal Summary
-                    </CustomDropdownItem>
-                    <CustomDropdownItem onClick={() => handleOptionSelect("Focused Assessment plus Substance Use")}>
-                    Focused Assessment plus Substance Use
-                    </CustomDropdownItem>
-                    <CustomDropdownItem onClick={() => handleOptionSelect("Child and Youth Mental Health Assessment")}>
-                    Child and Youth Mental Health Assessment
-                    </CustomDropdownItem>
-                    <CustomDropdownItem onClick={() => handleOptionSelect("Focused Assessment")}>
-                    Focused Assessment
-                    </CustomDropdownItem>
-                    <CustomDropdownItem onClick={() => handleOptionSelect("Comprehensive Assessment")}>
-                    Comprehensive Assessment
-                    </CustomDropdownItem>
-                    <CustomDropdownItem onClick={() => handleOptionSelect("Forensic Comprehensive Assessment")}>
-                    Forensic Comprehensive Assessment
-                    </CustomDropdownItem>
-                  </MDBDropdownMenu>
-                </MDBDropdown>
-                <MDBBtn
-                  color="light"
-                  onClick={fetchData}
-                  style={{ marginLeft: "10px" }}
-                >
+              </DatePickerContainer>
+              <div className="d-flex justify-content-center mt-3">
+                <MDBBtn color="light" onClick={fetchData}>
                   Fetch Data
                 </MDBBtn>
-              </DatePickerContainer>
+              </div>
             </MDBCardBody>
           </MDBCard>
         </MDBCol>
