@@ -1,32 +1,58 @@
 from collections import defaultdict
 from config.formula import integrated_formulations, presentation_factors, precipitating_factors, predisposing_factors, perpetuating_factors, protective_factors, multiple_factors
+import re
+# def get_exact_match_from_text(text, list_of_words):
+#     text = str(text.lower().strip())
+#     list_of_words = [word.lower().strip() for word in list_of_words]
+#     text_split = text.split(" ")
+#     word_match_count_dict = defaultdict(int)
+
+#     for word in list_of_words:
+#         if word in text_split:
+#             word_match_count_dict[word] += text_split.count(word)
+    
+#     return word_match_count_dict
+
+# def get_prefix_match_from_text(text, list_of_words):
+    
+#     text = str(text.lower().strip())
+#     list_of_words = [word.lower().strip() for word in list_of_words]
+#     text_split = text.split(" ")
+#     word_match_count_dict = defaultdict(int)
+
+#     for word in list_of_words:
+#         for text_word in text_split:
+#             if text_word.startswith(word):
+#                 word_match_count_dict[word] += 1
+            
+    
+#     return word_match_count_dict
+
 
 def get_exact_match_from_text(text, list_of_words):
-    text = str(text.lower().strip())
-    list_of_words = [word.lower().strip() for word in list_of_words]
-    text_split = text.split(" ")
+    
     word_match_count_dict = defaultdict(int)
 
     for word in list_of_words:
-        if word in text_split:
-            word_match_count_dict[word] += text_split.count(word)
+        pattern = re.compile(re.escape(word), re.IGNORECASE)
+        match = pattern.findall(text)
+        if len(match)>0:
+            word_match_count_dict[word] += len(match)
     
     return word_match_count_dict
 
 def get_prefix_match_from_text(text, list_of_words):
     
-    text = str(text.lower().strip())
-    list_of_words = [word.lower().strip() for word in list_of_words]
-    text_split = text.split(" ")
     word_match_count_dict = defaultdict(int)
 
     for word in list_of_words:
-        for text_word in text_split:
-            if text_word.startswith(word):
-                word_match_count_dict[word] += 1
-            
+        pattern = re.compile(r'\b' + re.escape(word), re.IGNORECASE)
+        match = pattern.findall(text)
+        if len(match)>0:
+            word_match_count_dict[word] += len(match)
     
     return word_match_count_dict
+
 
 def get_exact_and_prefix_match_stat_from_text(text, order_dict):
     text = str(text.lower().strip())

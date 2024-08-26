@@ -27,7 +27,7 @@ presentation_factors = {
 precipitating_factors = {
     "first_order": {
         "exact": ["context", "trigger"],
-        "prefix": ["percipit"]
+        "prefix": ["precipit"]
     },
     "second_order": {
         "exact": ["relapse", "instigate", "induced", "exacerbated"],
