@@ -102,16 +102,16 @@ def get_formulation_label_LLM(text_input):
     number_of_presented_formulation = len([k for k,v in new_stat_dict.items() if v > 0])
     all_key_words = []
     if number_of_presented_formulation < 2:
-        return "Absent 5 P's Formulation", 'Absent Integrated Formulation', all_key_words
+        return ("Absent 5 P's Formulation", 'Absent Integrated Formulation', all_key_words), {}
     elif number_of_presented_formulation >=2 and number_of_presented_formulation < 4:
-        return "Limited 5 P's Formulation", "Absent Integrated Formulation", all_key_words
+        return ("Limited 5 P's Formulation", "Absent Integrated Formulation", all_key_words), {}
     elif number_of_presented_formulation >= 4:
         if integrated == 0:
-            return "Inclusive 5 P's Formulation", "Absent Integrated Formulation", all_key_words
+            return ("Inclusive 5 P's Formulation", "Absent Integrated Formulation", all_key_words), {}
         if integrated <= 3:
-            return "Inclusive 5 P's Formulation", "Limited Integrated Formulation", all_key_words
+            return ("Inclusive 5 P's Formulation", "Limited Integrated Formulation", all_key_words), {}
         elif integrated >=4:
-            return "Inclusive 5 P's Formulation", "Inclusive Integrated Formulation", all_key_words
+            return ("Inclusive 5 P's Formulation", "Inclusive Integrated Formulation", all_key_words), {}
 
 if __name__ == "__main__":
     # Example usage
