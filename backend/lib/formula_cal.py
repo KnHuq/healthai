@@ -67,6 +67,7 @@ def get_exact_and_prefix_match_stat_from_text(text, order_dict):
     return data
 
 def get_match_stat_from_text(text, formulation_dict):
+    
     text = str(text.lower().strip())
     first_order_dict = formulation_dict['first_order']
     second_order_dict = formulation_dict['second_order']
@@ -95,7 +96,7 @@ def get_grouping_label(formulation_match_stat_dict, use_first_order = True, use_
                 total_count += len(v2.keys())
                 if len(v2.keys()) > 0:
                     # if k != 'multiple':
-                    print ("WARNING!!! Multiple order is not implemented yet")
+                    # print ("WARNING!!! Multiple order is not implemented yet")
                     all_key_words += list(v2.keys())
 
         new_stat_dict[k] = total_count
@@ -128,7 +129,6 @@ def get_formulation_label(text):
         "protective": get_match_stat_from_text(text, protective_factors),
         "multiple": get_match_stat_from_text(text, multiple_factors)
     }
-
     return get_grouping_label(formula_stat), formula_stat
 
 
