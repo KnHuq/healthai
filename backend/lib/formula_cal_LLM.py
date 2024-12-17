@@ -56,7 +56,7 @@ Guidelines for Analysis:
 def analyze_clinical_notes(text, temperature=0):
     # Define the payload for the API request
     payload = {
-        "model": "llama3.1",
+        "model": "llama3.2:1b",
         "prompt": text,
         "stream": False,
         "format": {
@@ -72,7 +72,8 @@ def analyze_clinical_notes(text, temperature=0):
             "required": ["integrated", "presentation", "precipitating", "predisposing", "perpetuating", "protective"]
         },
         "options": {
-            "temperature": temperature
+            "temperature": temperature,
+            "num_ctx": 2048
         },
         "system": system_prompt
     }
