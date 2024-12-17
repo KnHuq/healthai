@@ -10,7 +10,7 @@ from tqdm import tqdm
 app = Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
 
-DATA  = "/Users/shezan/work/healthai/backend/data/data_trun.csv"
+DATA  = "/Users/shezan/work/QH/healthai/backend/data/data.csv"
 DATA_DF = pd.read_csv(DATA)
 DATA_DF['eventdate'] = pd.to_datetime(DATA_DF['eventdate'])
 
@@ -151,12 +151,12 @@ def formulationtable_data():
     print (f' length of all_texts: {len(all_texts)}')
     all_results = list(map(get_formulation_label, all_texts))
 
-    all_results_LLM = []
-    for text in tqdm(all_texts):
-        all_results_LLM.append(get_formulation_label_LLM(text))
+    # all_results_LLM = []
+    # for text in tqdm(all_texts):
+    #     all_results_LLM.append(get_formulation_label_LLM(text))
 
-    print (f'all results:--> {[i[0][:2] for i in all_results]}')
-    print (f'all results LLM:--> {[i[0][:2] for i in all_results_LLM]}')
+    # print (f'all results:--> {[i[0][:2] for i in all_results]}')
+    # print (f'all results LLM:--> {[i[0][:2] for i in all_results_LLM]}')
     # group by month
     # import pdb; pdb.set_trace()
     filtered_data['iformula'] = [i[0][0] for i in all_results]
@@ -171,20 +171,20 @@ def formulationtable_data():
         final_dict[group_n.to_timestamp().isoformat()] = d
 
     #### LLM DATA ####
-    filtered_data['iformula_LLM'] = [i[0][0] for i in all_results_LLM]
-    filtered_data['factors_LLM'] = [i[0][1] for i in all_results_LLM]
-    filtered_data['key_words_LLM'] = [r[0][-1] for r in all_results_LLM]
-    grouped_data_LLM = filtered_data.groupby('month')
-    final_dict_LLM = {}
-    for group_n, group_df in grouped_data_LLM:
-        d = group_df['factors_LLM'].value_counts().to_dict()
-        d.update((group_df['iformula_LLM'].value_counts().to_dict()))
-        try:
-            del d['Absent Integrated Formulation']
-        except:
-            pass
+    # filtered_data['iformula_LLM'] = [i[0][0] for i in all_results_LLM]
+    # filtered_data['factors_LLM'] = [i[0][1] for i in all_results_LLM]
+    # filtered_data['key_words_LLM'] = [r[0][-1] for r in all_results_LLM]
+    # grouped_data_LLM = filtered_data.groupby('month')
+    # final_dict_LLM = {}
+    # for group_n, group_df in grouped_data_LLM:
+    #     d = group_df['factors_LLM'].value_counts().to_dict()
+    #     d.update((group_df['iformula_LLM'].value_counts().to_dict()))
+    #     try:
+    #         del d['Absent Integrated Formulation']
+    #     except:
+    #         pass
 
-        final_dict_LLM[group_n.to_timestamp().isoformat()] = d
+    #     final_dict_LLM[group_n.to_timestamp().isoformat()] = d
 
 
 
@@ -213,29 +213,29 @@ def formulationtable_data():
         data.append(d)
 
 
-    data_LLM = []
+    # data_LLM = []
 
 
-    for k, v in final_dict_LLM.items():
-        d = {
-            "month": k,
-            "Limited Integrated Formulation":0,
-            "Inclusive Integrated Formulation":0,
-            "Limited 5 P's Formulation":0,
-            "Absent 5 P's Formulation":0,
-            "Inclusive 5 P's Formulation":0,
-            "Limited Integrated Formulation (%)":0,
-            "Inclusive Integrated Formulation (%)":0,
-            "Limited 5 P's Formulation (%)":0,
-            "Absent 5 P's Formulation (%)":0,
-            "Inclusive 5 P's Formulation (%)":0,
+    # for k, v in final_dict_LLM.items():
+    #     d = {
+    #         "month": k,
+    #         "Limited Integrated Formulation":0,
+    #         "Inclusive Integrated Formulation":0,
+    #         "Limited 5 P's Formulation":0,
+    #         "Absent 5 P's Formulation":0,
+    #         "Inclusive 5 P's Formulation":0,
+    #         "Limited Integrated Formulation (%)":0,
+    #         "Inclusive Integrated Formulation (%)":0,
+    #         "Limited 5 P's Formulation (%)":0,
+    #         "Absent 5 P's Formulation (%)":0,
+    #         "Inclusive 5 P's Formulation (%)":0,
 
 
-        }
-        total = sum([v for k,v in v.items()])
-        d.update({k+ " (%)": round((v/total)*100,2) for k, v in v.items()})
-        d.update({k: v for k, v in v.items()})
-        data_LLM.append(d)
+    #     }
+    #     total = sum([v for k,v in v.items()])
+    #     d.update({k+ " (%)": round((v/total)*100,2) for k, v in v.items()})
+    #     d.update({k: v for k, v in v.items()})
+    #     data_LLM.append(d)
         
     # response_data = {
     #     "bar_data": data,
@@ -335,7 +335,11 @@ def formulationtable_data():
 
     response_data = [
 
-        {"title": "Comparison of Formulations in Selected Clinical Notes Over Time",
+        {"title": "Comparison of Formulations in Selected Clinical Notes Over Time (Word Search)",
+        "data": data},
+        {"title": "Comparison of Formulations in Selected Clinical Notes Over Time (NLP)",
+        "data": data},
+        {"title": "Comparison of Formulations in Selected Clinical Notes Over Time (NLP+ Word Search)",
         "data": data},
         {"title": "Comparision of the Clinical Note Templates (notes that have text) Over Time",
         "data": final_template_data},
@@ -426,4 +430,6 @@ def formulationtable_data():
 
 if __name__ == "__main__":
     # add ip of 0.0.0.0 and port of 8080
-    app.run(port=5000, debug=True)
+    # add ip and port in the frontend
+    app.run(host='0.0.0.0', port=5001, debug=True)
+    # app.run(port=5000, debug=True)
