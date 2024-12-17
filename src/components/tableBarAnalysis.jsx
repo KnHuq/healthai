@@ -339,7 +339,8 @@ const TableBarAnalysis = () => {
 
   useEffect(() => {
     const fetchInitialState = async () => {
-      const url = "https://capable-lamprey-widely.ngrok-free.app/api/initial_state";
+      // const url = "https://capable-lamprey-widely.ngrok-free.app/api/initial_state";
+      const url = "http://127.0.0.1:5000/api/initial_state";
 
       const headers = new Headers();
       headers.append("ngrok-skip-browser-warning", "true");
@@ -368,7 +369,8 @@ const TableBarAnalysis = () => {
   const fetchData = async () => {
     const start = startDate.toISOString().split("T")[0];
     const end = endDate.toISOString().split("T")[0];
-    const url = `https://capable-lamprey-widely.ngrok-free.app/api/formulation_data?start_date=${start}&end_date=${end}&treating_unit=${selectedTreatingUnit}&tu_special_service_type=${selectedTuSpecialServiceType}`;
+    // const url = `https://capable-lamprey-widely.ngrok-free.app/api/formulation_data?start_date=${start}&end_date=${end}&treating_unit=${selectedTreatingUnit}&tu_special_service_type=${selectedTuSpecialServiceType}`;
+    const url = `http://127.0.0.1:5000/api/formulation_data?start_date=${start}&end_date=${end}&treating_unit=${selectedTreatingUnit}&tu_special_service_type=${selectedTuSpecialServiceType}`;
 
     const headers = new Headers();
     headers.append("ngrok-skip-browser-warning", "true");
