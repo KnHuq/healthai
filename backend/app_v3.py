@@ -7,10 +7,12 @@ from lib.formula_cal_LLM import get_formulation_label_LLM
 from collections import Counter
 from functools import reduce
 from tqdm import tqdm
+from collections import defaultdict
+import numpy as np
 app = Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
 
-DATA  = "/Users/shezan/work/QH/healthai/backend/data/data.csv"
+DATA  = "/Users/shezan/work/QH/healthai/backend/data/data_checkpoint.csv"
 DATA_DF = pd.read_csv(DATA)
 DATA_DF['eventdate'] = pd.to_datetime(DATA_DF['eventdate'])
 
@@ -125,7 +127,12 @@ def initial_state():
 @app.route("/api/formulation_data", methods=['GET'])
 def formulationtable_data():
     print ('formulationtable_data is called.....')
-    global DATA_DF
+    # global DATA_DF
+
+    DATA  = "/Users/shezan/work/QH/healthai/backend/data/data_checkpoint.csv"
+    DATA_DF = pd.read_csv(DATA)
+    DATA_DF['eventdate'] = pd.to_datetime(DATA_DF['eventdate'])
+
     # Extract start_date and end_date from query parameters
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")
@@ -138,19 +145,20 @@ def formulationtable_data():
     filtered_data = DATA_DF[(DATA_DF['eventdate'] >= start_date) & (DATA_DF['eventdate'] <= end_date)]
 
     filtered_data = filtered_data[
-        (filtered_data['TreatingUnitDesc'] == "RAMHT") &
-        (filtered_data['TUSpecialServiceType'] == "Community Care Team")
+        (filtered_data['TreatingUnitDesc'] == treating_unit) &
+        (filtered_data['TUSpecialServiceType'] == tu_special_service_type)
     ]
-
+    print (f'filtered_data length: {len(filtered_data)}')
     filtered_data.sort_values(by='eventdate', ascending=True, inplace=True)
+    
     if filtered_data.empty:
+        print ('filtered_data is empty')
         return jsonify([])
     
     filtered_data['month'] = filtered_data['eventdate'].dt.to_period('M')
     all_texts = list(filtered_data['formulationOverallClinicalImpression'])
     print (f' length of all_texts: {len(all_texts)}')
     all_results = list(map(get_formulation_label, all_texts))
-
     # all_results_LLM = []
     # for text in tqdm(all_texts):
     #     all_results_LLM.append(get_formulation_label_LLM(text))
@@ -161,14 +169,12 @@ def formulationtable_data():
     # import pdb; pdb.set_trace()
     filtered_data['iformula'] = [i[0][0] for i in all_results]
     filtered_data['factors'] = [i[0][1] for i in all_results]
-    filtered_data['key_words'] = [r[0][-1] for r in all_results]
-    grouped_data = filtered_data.groupby('month')
-    final_dict = {}
-    for group_n, group_df in grouped_data:
-        d = group_df['factors'].value_counts().to_dict()
-        d.update((group_df['iformula'].value_counts().to_dict()))
-        del d['Absent Integrated Formulation']
-        final_dict[group_n.to_timestamp().isoformat()] = d
+    filtered_data['key_words'] = [r[0][-2] for r in all_results]
+
+    filtered_data['ps_stat'] = [r[0][-1] for r in all_results]
+
+
+
 
     #### LLM DATA ####
     # filtered_data['iformula_LLM'] = [i[0][0] for i in all_results_LLM]
@@ -187,8 +193,87 @@ def formulationtable_data():
     #     final_dict_LLM[group_n.to_timestamp().isoformat()] = d
 
 
+    ps_dict = defaultdict(list)
+    for v_dict in filtered_data['ps_stat']:
+        for k,v in v_dict.items():
+            ps_dict[k].append(v)
+    c_df = pd.DataFrame(ps_dict)
+    cols_list = ['integrated', 'perpetuating','precipitating', 'predisposing', 'presentation', 'protective']
+    key_word_values = c_df[cols_list].values
+    llm_values = filtered_data[cols_list].values
+    key_p_llm_values = np.maximum(key_word_values[:llm_values.shape[0],:], llm_values)
 
 
+    ## only LLM values
+    llm_values_ps = np.count_nonzero(llm_values[1:],axis=1).tolist()
+    llm_integrated = llm_values[:,0].tolist()
+    zipped_ip_llm = zip(llm_integrated, llm_values_ps)
+
+    final_i_llm = []
+    final_p_llm = []
+    for integrated, number_of_presented_formulation in zipped_ip_llm:
+        if number_of_presented_formulation < 2:
+            final_i_llm.append("Absent 5 P's Formulation")
+            final_p_llm.append('Absent Integrated Formulation')
+        elif number_of_presented_formulation >=2 and number_of_presented_formulation < 4:       
+            final_i_llm.append("Limited 5 P's Formulation")
+            final_p_llm.append("Absent Integrated Formulation")
+        elif number_of_presented_formulation >= 4:
+            if integrated == 0:
+                final_i_llm.append("Inclusive 5 P's Formulation")
+                final_p_llm.append("Absent Integrated Formulation")
+            else:
+                final_i_llm.append("Inclusive 5 P's Formulation")
+                final_p_llm.append("Inclusive Integrated Formulation")
+
+    
+    filtered_data['iformula_LLM'] = filtered_data['iformula'].copy()
+    filtered_data['factors_LLM'] = filtered_data['factors'].copy()
+    filtered_data['iformula_LLM_words'] = filtered_data['iformula'].copy()
+    filtered_data['factors_LLM_words'] = filtered_data['factors'].copy()
+
+    filtered_data['iformula_LLM'][:len(final_i_llm)] = final_i_llm
+    filtered_data['factors_LLM'][:len(final_p_llm)] = final_p_llm
+
+
+    # now k and llm data
+
+    key_p_llm_values_ps = np.count_nonzero(key_p_llm_values[1:],axis=1).tolist()
+    key_p_llm_values_integrated = key_p_llm_values[:,0].tolist()
+    zipped_ip_llm = zip(key_p_llm_values_integrated, key_p_llm_values_ps)
+
+    final_i_llm_k = []
+    final_p_llm_k = []
+    for integrated, number_of_presented_formulation in zipped_ip_llm:
+        if number_of_presented_formulation < 2:
+            final_i_llm_k.append("Absent 5 P's Formulation")
+            final_p_llm_k.append('Absent Integrated Formulation')
+        elif number_of_presented_formulation >=2 and number_of_presented_formulation < 4:       
+            final_i_llm_k.append("Limited 5 P's Formulation")
+            final_p_llm_k.append("Absent Integrated Formulation")
+        elif number_of_presented_formulation >= 4:
+            if integrated == 0:
+                final_i_llm_k.append("Inclusive 5 P's Formulation")
+                final_p_llm_k.append("Absent Integrated Formulation")
+            else:
+                final_i_llm_k.append("Inclusive 5 P's Formulation")
+                final_p_llm_k.append("Inclusive Integrated Formulation")
+
+    filtered_data['iformula_LLM_words'][:len(final_i_llm_k)] = final_i_llm_k
+    filtered_data['factors_LLM_words'][:len(final_p_llm_k)] = final_p_llm_k
+
+
+    # import pdb; pdb.set_trace()
+
+    grouped_data = filtered_data.groupby('month')
+
+    final_dict = {}
+    for group_n, group_df in grouped_data:
+        d = group_df['factors'].value_counts().to_dict()
+        d.update((group_df['iformula'].value_counts().to_dict()))
+        del d['Absent Integrated Formulation']
+        final_dict[group_n.to_timestamp().isoformat()] = d
+    
     data = []
 
     for k, v in final_dict.items():
@@ -213,8 +298,62 @@ def formulationtable_data():
         data.append(d)
 
 
-    # data_LLM = []
+    final_dict_LLM = {}
+    for group_n, group_df in grouped_data:
+        d = group_df['factors_LLM'].value_counts().to_dict()
+        d.update((group_df['iformula_LLM'].value_counts().to_dict()))
+        del d['Absent Integrated Formulation']
+        final_dict_LLM[group_n.to_timestamp().isoformat()] = d
 
+    data_LLM = []
+    for k, v in final_dict_LLM.items():
+        d = {
+            "month": k,
+            "Limited Integrated Formulation":0,
+            "Inclusive Integrated Formulation":0,
+            "Limited 5 P's Formulation":0,
+            "Absent 5 P's Formulation":0,
+            "Inclusive 5 P's Formulation":0,
+            "Limited Integrated Formulation (%)":0,
+            "Inclusive Integrated Formulation (%)":0,
+            "Limited 5 P's Formulation (%)":0,
+            "Absent 5 P's Formulation (%)":0,
+            "Inclusive 5 P's Formulation (%)":0,
+        }
+
+        total = sum([v for k,v in v.items()])
+        d.update({k+ " (%)": round((v/total)*100,2) for k, v in v.items()})
+        d.update({k: v for k, v in v.items()})
+        data_LLM.append(d)
+
+
+    final_dict_LLM_words = {}
+    for group_n, group_df in grouped_data:
+        d = group_df['factors_LLM_words'].value_counts().to_dict()
+        d.update((group_df['iformula_LLM_words'].value_counts().to_dict()))
+        del d['Absent Integrated Formulation']
+        final_dict_LLM_words[group_n.to_timestamp().isoformat()] = d
+
+    data_LLM_words = []
+    for k, v in final_dict_LLM_words.items():
+        d = {
+            "month": k,
+            "Limited Integrated Formulation":0,
+            "Inclusive Integrated Formulation":0,
+            "Limited 5 P's Formulation":0,
+            "Absent 5 P's Formulation":0,
+            "Inclusive 5 P's Formulation":0,
+            "Limited Integrated Formulation (%)":0,
+            "Inclusive Integrated Formulation (%)":0,
+            "Limited 5 P's Formulation (%)":0,
+            "Absent 5 P's Formulation (%)":0,
+            "Inclusive 5 P's Formulation (%)":0,
+        }
+
+        total = sum([v for k,v in v.items()])
+        d.update({k+ " (%)": round((v/total)*100,2) for k, v in v.items()})
+        d.update({k: v for k, v in v.items()})
+        data_LLM_words.append(d)
 
     # for k, v in final_dict_LLM.items():
     #     d = {
@@ -338,9 +477,9 @@ def formulationtable_data():
         {"title": "Comparison of Formulations in Selected Clinical Notes Over Time (Word Search)",
         "data": data},
         {"title": "Comparison of Formulations in Selected Clinical Notes Over Time (NLP)",
-        "data": data},
+        "data": data_LLM},
         {"title": "Comparison of Formulations in Selected Clinical Notes Over Time (NLP+ Word Search)",
-        "data": data},
+        "data": data_LLM_words},
         {"title": "Comparision of the Clinical Note Templates (notes that have text) Over Time",
         "data": final_template_data},
         {"title": "Grouped Number of Characters in the Clinical Notes Over Time",

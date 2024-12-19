@@ -3,11 +3,11 @@ import json
 
 # Define the system prompt
 system_prompt ="""
-You are an advanced AI designed to analyze clinical notes of mental health patients, leveraging your understanding of psychological frameworks and therapeutic models, including the "Five Ps" framework. Your task is to identify and count occurrences of six key factors in the text. These factors may be explicitly stated or implied through context, requiring your advanced understanding of mental health concepts and terminology.
+You are an advanced AI designed to analyze clinical notes of mental health patients, leveraging your understanding of psychological frameworks and therapeutic models, including the "Six Ps" framework. Your task is to identify and count occurrences of six key factors in the text. These factors may be explicitly stated or implied through context, requiring your advanced understanding of mental health concepts and terminology.
 Key Responsibilities:
 1. **Identify Factors**:
    - Analyze the text for mentions or implications of the six factors: presenting, predisposing, precipitating, perpetuating, integrated, and protective.
-   - Use your knowledge to interpret context, avoiding reliance solely on specific keywords.
+   - Use your knowledge to interpret context, avoiding reliance solely on specific keywords. 
 2. **Interpret Context**:
    - Consider the patient's history, environmental factors, relationships, coping mechanisms, and current circumstances to deduce the presence of factors.
    - Recognize implied factors based on holistic descriptions, such as "support from family" implying protective factors or "stressful work environment" implying perpetuating or precipitating factors.
@@ -51,6 +51,8 @@ Guidelines for Analysis:
 - Apply your expertise in mental health concepts and therapeutic practices to ensure a thorough and accurate analysis.
 - Use your contextual understanding to bridge gaps between explicit mentions and implied meanings.
 - Be comprehensive in your analysis, ensuring no factor is overlooked if supported by the text.
+- always return the keys integrated, presentation, precipitating, predisposing, perpetuating, protective.
+- if any key is not found, return 0. integrated factor must be returned
 """
 
 def analyze_clinical_notes(text, temperature=0):
@@ -73,7 +75,7 @@ def analyze_clinical_notes(text, temperature=0):
         },
         "options": {
             "temperature": temperature,
-            "num_ctx": 2048
+            "num_ctx": 10000
         },
         "system": system_prompt
     }
@@ -95,6 +97,7 @@ def analyze_clinical_notes(text, temperature=0):
 
 def get_formulation_label_LLM(text_input):
     new_stat_dict = analyze_clinical_notes(text_input)
+    new_stat_dict_raw = new_stat_dict.copy()
     try:
         integrated = new_stat_dict.pop('integrated')
     except KeyError:
@@ -103,16 +106,16 @@ def get_formulation_label_LLM(text_input):
     number_of_presented_formulation = len([k for k,v in new_stat_dict.items() if v > 0])
     all_key_words = []
     if number_of_presented_formulation < 2:
-        return ("Absent 5 P's Formulation", 'Absent Integrated Formulation', all_key_words), {}
+        return ("Absent 5 P's Formulation", 'Absent Integrated Formulation', all_key_words), {}, new_stat_dict_raw
     elif number_of_presented_formulation >=2 and number_of_presented_formulation < 4:
-        return ("Limited 5 P's Formulation", "Absent Integrated Formulation", all_key_words), {}
+        return ("Limited 5 P's Formulation", "Absent Integrated Formulation", all_key_words), {}, new_stat_dict_raw
     elif number_of_presented_formulation >= 4:
         if integrated == 0:
-            return ("Inclusive 5 P's Formulation", "Absent Integrated Formulation", all_key_words), {}
+            return ("Inclusive 5 P's Formulation", "Absent Integrated Formulation", all_key_words), {}, new_stat_dict_raw
         if integrated <= 3:
-            return ("Inclusive 5 P's Formulation", "Limited Integrated Formulation", all_key_words), {}
+            return ("Inclusive 5 P's Formulation", "Limited Integrated Formulation", all_key_words), {}, new_stat_dict_raw
         elif integrated >=4:
-            return ("Inclusive 5 P's Formulation", "Inclusive Integrated Formulation", all_key_words), {}
+            return ("Inclusive 5 P's Formulation", "Inclusive Integrated Formulation", all_key_words), {}, new_stat_dict_raw
 
 if __name__ == "__main__":
     # Example usage

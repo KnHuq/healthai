@@ -101,22 +101,22 @@ def get_grouping_label(formulation_match_stat_dict, use_first_order = True, use_
 
         new_stat_dict[k] = total_count
 
-    
+    new_stat_dict_raw = new_stat_dict.copy()
     integrated = new_stat_dict.pop('integrated')
     multiple = new_stat_dict.pop('multiple')
     number_of_presented_formulation = len([k for k,v in new_stat_dict.items() if v > 0])
 
     if number_of_presented_formulation < 2:
-        return "Absent 5 P's Formulation", 'Absent Integrated Formulation', all_key_words
-    elif number_of_presented_formulation >=2 and number_of_presented_formulation < 4:
-        return "Limited 5 P's Formulation", "Absent Integrated Formulation", all_key_words
+        return "Absent 5 P's Formulation", 'Absent Integrated Formulation', all_key_words, new_stat_dict_raw
+    elif number_of_presented_formulation >=2 and number_of_presented_formulation < 4:       
+        return "Limited 5 P's Formulation", "Absent Integrated Formulation", all_key_words, new_stat_dict_raw
     elif number_of_presented_formulation >= 4:
         if integrated == 0:
-            return "Inclusive 5 P's Formulation", "Absent Integrated Formulation", all_key_words
+            return "Inclusive 5 P's Formulation", "Absent Integrated Formulation", all_key_words, new_stat_dict_raw
         if integrated <= 3:
-            return "Inclusive 5 P's Formulation", "Limited Integrated Formulation", all_key_words
+            return "Inclusive 5 P's Formulation", "Limited Integrated Formulation", all_key_words, new_stat_dict_raw    
         elif integrated >=4:
-            return "Inclusive 5 P's Formulation", "Inclusive Integrated Formulation", all_key_words
+            return "Inclusive 5 P's Formulation", "Inclusive Integrated Formulation", all_key_words, new_stat_dict_raw
     
 def get_formulation_label(text):
     text = str(text.lower().strip())
