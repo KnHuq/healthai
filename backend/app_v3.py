@@ -12,7 +12,7 @@ import numpy as np
 app = Flask(__name__)
 CORS(app)  # This will enable CORS for all routes
 
-DATA  = "/Users/shezan/work/QH/healthai/backend/data/data_checkpoint.csv"
+DATA  = "/home/knhuq/t25/healthai/backend/data/data_checkpoint.csv"
 DATA_DF = pd.read_csv(DATA)
 DATA_DF['eventdate'] = pd.to_datetime(DATA_DF['eventdate'])
 
