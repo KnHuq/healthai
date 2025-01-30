@@ -10,7 +10,7 @@ from tqdm import tqdm
 from collections import defaultdict
 import numpy as np
 app = Flask(__name__)
-CORS(app)  # This will enable CORS for all routes
+CORS(app,  resources={r"/*": {"origins": "http://localhost:3000"}})  # This will enable CORS for all routes
 
 DATA  = "/Users/shezan/work/QH/healthai/backend/data/data_checkpoint.csv"
 DATA_DF = pd.read_csv(DATA)
