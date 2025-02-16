@@ -7,6 +7,9 @@ import pandas as pd
 from collections import Counter
 import numpy as np
 
+import os
+from tqdm import tqdm
+
 # Default settings if file not found
 DEFAULT_SETTINGS = {
     "model": "llama3.1:latest",
@@ -176,8 +179,9 @@ def analyze_clinical_notes_without_explanations(text, temperature=0):
         return {"error": "Invalid response format"}
 
 
-data_path = "/home/knhuq/work/databse_final/data.csv"
+data_path = "/home/knhuq/work/databse_final/data_leftover.csv"
 df = pd.read_csv(data_path)
+df = df.dropna(subset=['progressNote']).reset_index()
 all_facility_w_count = dict(Counter(list(df['encounterFacility'])))
 all_keys = list(filter(bool,list(all_facility_w_count.keys())))
 all_keys = [i for i in all_keys if i is not np.nan]
@@ -197,13 +201,9 @@ encounter_facility_zipped = list(zip(all_encounter_facility, all_index))
 index_map = {k: i for i, k in enumerate(final_list)}
 # Sort x based on the sequence from l
 encounter_facility_zipped_sorted = sorted(encounter_facility_zipped, key=lambda item: index_map.get(item[0], float('inf')))
-encounter_facility_zipped_sorted[:10]
 
-df = df.dropna(subset=['progressNote'])
 
-import os
-from tqdm import tqdm
-SAVING_PATH = "/home/knhuq/work/database_extracted_chunks"
+SAVING_PATH = "/home/knhuq/work/database_final_chunks"
 SAVING_THRESHOLD = 1000
 
 
