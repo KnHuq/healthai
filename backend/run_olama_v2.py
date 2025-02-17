@@ -9,8 +9,19 @@ from datetime import datetime, timedelta
 import pandas as pd
 import re
 
-DATAFRAME = pd.read_csv('/Users/shezan/QH/healthai/backend/data/data_raw_chunk.csv')
-DATAFRAME['date'] = pd.to_datetime(DATAFRAME['clinicalNoteDate'], format='%d/%m/%Y')
+# This should stay as is - caches the entire dataframe
+@st.cache_data
+def load_dataframe():
+    """
+    Load the dataframe and cache it.
+    Only reloads if the server restarts or cache is cleared.
+    """
+    df = pd.read_csv('/Users/shezan/QH/healthai/backend/data/data_raw_chunk.csv')
+    df['date'] = pd.to_datetime(df['clinicalNoteDate'], format='%d/%m/%Y')
+    return df
+
+# Replace the global DATAFRAME with the cached version
+DATAFRAME = load_dataframe()
 
 def safe_markdown_render(text):
     """
@@ -50,14 +61,13 @@ def get_start_end_date():
     
     return min_date.date(), max_date.date()
 
+# Cache with hash_funcs to handle date inputs
+@st.cache_data(hash_funcs={datetime: str})
 def get_patient_Ids(start_date, end_date):
     """
     Get unique patient IDs between start_date and end_date
-    Returns list of patient IDs
+    Cache result based on date inputs
     """
-    # Convert string dates to datetime
-    DATAFRAME['date'] = pd.to_datetime(DATAFRAME['clinicalNoteDate'], format='%d/%m/%Y')
-    
     # Convert input dates to datetime
     start_dt = pd.to_datetime(start_date)
     end_dt = pd.to_datetime(end_date)
@@ -66,30 +76,24 @@ def get_patient_Ids(start_date, end_date):
     mask = (DATAFRAME['date'] >= start_dt) & (DATAFRAME['date'] <= end_dt)
     filtered_df = DATAFRAME[mask]
     
-    # Get unique patient IDs
     patient_ids = filtered_df['ConsumerID'].unique().tolist()
-    
-    # Sort IDs for better presentation
     patient_ids.sort()
     
-    # Limit to first 100 patients if there are too many
     if len(patient_ids) > 100:
         patient_ids = patient_ids[:100]
     
     return patient_ids
 
+# Cache based on patient_id input
+@st.cache_data
 def get_clinical_notes(patient_id):
     """
     Get all clinical notes for a specific patient ID
-    Returns list of tuples containing (note, date)
+    Cache result based on patient_id
     """
-    # Filter dataframe for patient ID
     patient_notes = DATAFRAME[DATAFRAME['ConsumerID'] == patient_id]
-    
-    # Sort by date
     patient_notes = patient_notes.sort_values('date', ascending=False)
     
-    # Get the progress notes and dates
     notes_with_dates = list(zip(
         patient_notes['progressNote'].tolist(),
         patient_notes['date'].dt.strftime('%d/%m/%Y').tolist()
@@ -126,11 +130,17 @@ client = Client(
     headers={'x-some-header': 'some-value'}
 )
 
-def analyze_clinical_notes_with_explanations(text, temperature=0):
+# Cache LLM analysis based on input text and temperature
+@st.cache_data
+def analyze_clinical_notes_with_explanations(note_text, temperature):
+    """
+    Cache LLM analysis based on input text and temperature
+    Will recompute if either changes
+    """
     # Define the payload for the API request
     payload = {
         "model": settings["model"],
-        "prompt": text,
+        "prompt": note_text,
         "stream": False,
         "format": {
             "type": "object",
@@ -202,7 +212,9 @@ def analyze_clinical_notes_with_explanations(text, temperature=0):
     except json.JSONDecodeError:
         return {"error": "Invalid response format"}
 
+@st.cache_data
 def get_llm_formulation_classification(llm_result):
+    """Cache the formulation classification"""
     # Determine the number of 5 P's factors present
     factors_present = sum(1 for factor in ["integrated", "presentation", "precipitating", "predisposing", "perpetuating", "protective"] if llm_result[factor]["count"] > 0)
     
