@@ -11,4 +11,4 @@ ALLOWED_ORIGINS = [
 ]
 
 # Data paths
-DATA_PATH = "data/chunks"
+DATA_PATH = "/home/knhuq/work/database_final_chunks"
