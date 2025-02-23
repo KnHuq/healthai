@@ -149,22 +149,28 @@ def initial_state():
     # Clean and normalize existing facility names
     DATA_DF['facility'] = DATA_DF['facility'].apply(normalize_facility_name)
     
-    # Get unique facilities, filtering out None values
-    facilities = [f for f in DATA_DF['facility'].unique() 
-                 if f is not None]
+    # Get facility counts
+    facility_counts = DATA_DF['facility'].value_counts()
+    
+    # Filter facilities with more than 100 records
+    valid_facilities = facility_counts[facility_counts >= 100].index.tolist()
+    
+    # Debug print
+    print("\nFacility counts:")
+    for facility, count in facility_counts.items():
+        print(f"{facility}: {count} records")
+    
+    print("\nSelected facilities (>= 100 records):")
+    for facility in valid_facilities:
+        print(f"{facility}: {facility_counts[facility]} records")
     
     # Sort facilities alphabetically
-    facilities.sort()
+    valid_facilities.sort()
     
-    # Debug print to check the cleaned names
-    print("\nUnique Facility Names after cleaning:")
-    for f in facilities:
-        print(f)
+    # Create facility mapping with only valid facilities
+    facility_mapping = {idx: facility for idx, facility in enumerate(valid_facilities, 1)}
     
-    # Create facility mapping with normalized names
-    facility_mapping = {idx: facility for idx, facility in enumerate(facilities, 1)}
-    
-    # Create date ranges with normalized names
+    # Create date ranges with valid facilities only
     facility_date_ranges = {}
     for idx, facility in facility_mapping.items():
         facility_data = DATA_DF[DATA_DF['facility'] == facility]
@@ -174,7 +180,8 @@ def initial_state():
         facility_date_ranges[idx] = {
             "minDate": min_date.strftime("%Y-%m-%d"),
             "maxDate": max_date.strftime("%Y-%m-%d"),
-            "name": facility
+            "name": facility,
+            "count": int(facility_counts[facility])  # Add count to the response
         }
     
     response_data = {
