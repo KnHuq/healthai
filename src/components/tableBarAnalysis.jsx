@@ -39,6 +39,8 @@ import TextField from "@mui/material/TextField";
 import styled from "styled-components";
 import { HexColorPicker } from "react-colorful";
 import API_CONFIG from '../config/api.js';
+import { format } from 'date-fns';
+import enGB from 'date-fns/locale/en-GB';  // Import British English locale for dd/MM/yyyy format
 
 const DatePickerContainer = muiStyled("div")({
   display: "flex",
@@ -887,9 +889,9 @@ const TableBarAnalysis = () => {
                           <br />
                           <small className="text-muted">
                             Available date range: {
-                              new Date(facilityDateRanges[selectedFacilityId].minDate).toLocaleDateString()
+                              format(new Date(facilityDateRanges[selectedFacilityId].minDate), 'dd/MM/yyyy', { locale: enGB })
                             } to {
-                              new Date(facilityDateRanges[selectedFacilityId].maxDate).toLocaleDateString()
+                              format(new Date(facilityDateRanges[selectedFacilityId].maxDate), 'dd/MM/yyyy', { locale: enGB })
                             }
                           </small>
                         </p>
@@ -897,7 +899,7 @@ const TableBarAnalysis = () => {
                         {/* Date Pickers only shown after facility selection */}
                         <DatePickerContainer>
                           <ThemeProvider theme={darkTheme}>
-                            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                            <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={enGB}>
                               <DatePicker
                                 label="Start Date"
                                 value={startDate}
@@ -905,6 +907,7 @@ const TableBarAnalysis = () => {
                                 minDate={new Date(facilityDateRanges[selectedFacilityId].minDate)}
                                 maxDate={new Date(facilityDateRanges[selectedFacilityId].maxDate)}
                                 renderInput={(params) => <DarkTextField {...params} />}
+                                inputFormat="dd/MM/yyyy"
                               />
                               <DatePicker
                                 label="End Date"
@@ -913,6 +916,7 @@ const TableBarAnalysis = () => {
                                 minDate={new Date(facilityDateRanges[selectedFacilityId].minDate)}
                                 maxDate={new Date(facilityDateRanges[selectedFacilityId].maxDate)}
                                 renderInput={(params) => <DarkTextField {...params} />}
+                                inputFormat="dd/MM/yyyy"
                               />
                             </LocalizationProvider>
                           </ThemeProvider>
