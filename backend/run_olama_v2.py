@@ -16,7 +16,10 @@ def load_dataframe():
     Load the dataframe and cache it.
     Only reloads if the server restarts or cache is cleared.
     """
-    df = pd.read_csv('/Users/shezan/QH/healthai/backend/data/data_raw_chunk.csv')
+    try:
+        df = pd.read_csv('/Users/shezan/QH/healthai/backend/data/data_raw_chunk.csv')
+    except:
+        df = pd.read_csv("/home/knhuq/work/databse_final/data.csv")
     df['date'] = pd.to_datetime(df['clinicalNoteDate'], format='%d/%m/%Y')
     return df
 
@@ -103,7 +106,7 @@ def get_clinical_notes(patient_id):
 
 # Default settings if file not found
 DEFAULT_SETTINGS = {
-    "model": "llama3.2:latest",
+    "model": "llama3.1:70b",
     "temperature": 0.0,
     "system_prompt": "",
 }
@@ -198,7 +201,7 @@ def analyze_clinical_notes_with_explanations(note_text, temperature):
         },
         "options": {
             "temperature": temperature,
-            "num_ctx": 400000
+            "num_ctx": 10000
         },
         "system": settings["system_prompt"]
     }

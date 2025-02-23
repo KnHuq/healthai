@@ -7,7 +7,7 @@ DEBUG = True
 ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://192.168.0.10:3000",
-    "http://10.225.71.89:3000"
+    "http://10.225.209.27:3000"
 ]
 
 # Data paths
