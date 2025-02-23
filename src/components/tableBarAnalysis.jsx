@@ -671,6 +671,80 @@ const CombinedComparison = ({ wordSearchData, nlpData, customColors }) => {
   );
 };
 
+// Add this CSS at the top of your file or in a separate CSS file
+const loadingStyles = `
+  @keyframes dnaRotate {
+    0% {
+      transform: translate(-50%, -50%) rotate(0deg) translateX(20px);
+    }
+    100% {
+      transform: translate(-50%, -50%) rotate(360deg) translateX(20px);
+    }
+  }
+
+  @keyframes dnaRotateReverse {
+    0% {
+      transform: translate(-50%, -50%) rotate(360deg) translateX(20px);
+    }
+    100% {
+      transform: translate(-50%, -50%) rotate(0deg) translateX(20px);
+    }
+  }
+
+  .dna-loader {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .dna-loader div {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #8884d8;
+    box-shadow: 0 0 10px #8884d8;
+    left: 50%;
+    top: 50%;
+  }
+
+  .dna-loader div:nth-child(odd) {
+    animation: dnaRotate 3s linear infinite;
+  }
+
+  .dna-loader div:nth-child(even) {
+    background: #82ca9d;
+    box-shadow: 0 0 10px #82ca9d;
+    animation: dnaRotateReverse 3s linear infinite;
+  }
+
+  .dna-loader div:nth-child(1) { animation-delay: -0.3s; }
+  .dna-loader div:nth-child(2) { animation-delay: -0.6s; }
+  .dna-loader div:nth-child(3) { animation-delay: -0.9s; }
+  .dna-loader div:nth-child(4) { animation-delay: -1.2s; }
+  .dna-loader div:nth-child(5) { animation-delay: -1.5s; }
+  .dna-loader div:nth-child(6) { animation-delay: -1.8s; }
+  .dna-loader div:nth-child(7) { animation-delay: -2.1s; }
+  .dna-loader div:nth-child(8) { animation-delay: -2.4s; }
+  .dna-loader div:nth-child(9) { animation-delay: -2.7s; }
+  .dna-loader div:nth-child(10) { animation-delay: -3.0s; }
+
+  @keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.7; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .loading-text {
+    animation: pulse 1.5s ease-in-out infinite;
+    color: #8884d8;
+    text-shadow: 0 0 10px rgba(136, 132, 216, 0.5);
+  }
+`;
+
 const TableBarAnalysis = () => {
   const [datasets, setDatasets] = useState([]);
   const [startDate, setStartDate] = useState(new Date("2018-03-15"));
@@ -687,6 +761,7 @@ const TableBarAnalysis = () => {
     chartColors: ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#387908']
   });
   const [activeColorPicker, setActiveColorPicker] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchInitialState = async () => {
@@ -725,6 +800,7 @@ const TableBarAnalysis = () => {
   }, [selectedFacilityId]);
 
   const fetchData = async () => {
+    setIsLoading(true);  // Start loading
     const start = startDate.toISOString().split("T")[0];
     const end = endDate.toISOString().split("T")[0];
     
@@ -746,7 +822,9 @@ const TableBarAnalysis = () => {
       const jsonData = await response.json();
       setDatasets(jsonData);
     } catch (error) {
-      console.error("Failed to fetch data:", error);
+      console.error("Error fetching data:", error);
+    } finally {
+      setIsLoading(false);  // Stop loading regardless of success/failure
     }
   };
 
@@ -763,6 +841,7 @@ const TableBarAnalysis = () => {
 
   return (
     <>
+      <style>{loadingStyles}</style>
       <MDBContainer 
         fluid 
         style={{ 
@@ -841,8 +920,21 @@ const TableBarAnalysis = () => {
 
                         {/* Fetch button only shown when facility is selected */}
                         <div className="d-flex justify-content-center mt-3">
-                          <MDBBtn color="light" onClick={fetchData}>
-                            Fetch Data
+                          <MDBBtn 
+                            color="light" 
+                            onClick={fetchData}
+                            disabled={isLoading}
+                          >
+                            {isLoading ? (
+                              <>
+                                <div className="spinner-border spinner-border-sm me-2" role="status">
+                                  <span className="visually-hidden">Loading...</span>
+                                </div>
+                                Fetching Data...
+                              </>
+                            ) : (
+                              'Fetch Data'
+                            )}
                           </MDBBtn>
                         </div>
                       </>
@@ -858,8 +950,41 @@ const TableBarAnalysis = () => {
               </MDBCol>
             </MDBRow>
             
-            {/* Add the combined comparison chart first */}
-            {datasets.length >= 2 && (
+            {/* Updated loading overlay */}
+            {isLoading && (
+              <div 
+                style={{
+                  position: 'fixed',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  zIndex: 9999,
+                  backdropFilter: 'blur(5px)',
+                }}
+              >
+                <div className="text-center text-white">
+                  <div className="dna-loader mb-4">
+                    {[...Array(10)].map((_, i) => (
+                      <div key={i} />
+                    ))}
+                  </div>
+                  <h4 className="mt-3 loading-text" style={{ color: '#8884d8' }}>
+                    Processing Clinical Data
+                  </h4>
+                  <p className="text-muted">
+                    Analyzing formulations and patterns...
+                  </p>
+                </div>
+              </div>
+            )}
+            
+            {/* Show charts only when not loading and data exists */}
+            {!isLoading && datasets.length >= 2 && (
               <CombinedComparison 
                 wordSearchData={datasets[0].data} 
                 nlpData={datasets[1].data}
@@ -867,15 +992,19 @@ const TableBarAnalysis = () => {
               />
             )}
             
-            {/* Filter out only the three specific charts */}
-            {datasets
+            {!isLoading && datasets
               .filter(dataset => ![
                 "Comparison of Formulations in Selected Clinical Notes Over Time (Word Search)",
                 "Comparison of Formulations in Selected Clinical Notes Over Time (NLP)",
                 "Comparison of Formulations in Selected Clinical Notes Over Time (NLP+ Word Search)"
               ].includes(dataset.title))
               .map((dataset, index) => (
-                <DataVisualization key={index} title={dataset.title} data={dataset.data} customColors={customColors} />
+                <DataVisualization 
+                  key={index} 
+                  title={dataset.title} 
+                  data={dataset.data} 
+                  customColors={customColors} 
+                />
               ))}
           </MDBCol>
         </MDBRow>
