@@ -104,19 +104,67 @@ table_data = [
     }
 ]
 
+def normalize_facility_name(name):
+    if pd.isna(name) or not isinstance(name, str):
+        return None
+        
+    # Common replacements for HTML entities and special characters
+    replacements = {
+        '&amp;': '&',
+        '&amp;amp;': '&',
+        '&AMP;': '&',
+        '&': 'and',
+        '(THE)': '',
+        '&amp;amp;amp;': '&'
+    }
+    
+    # Apply replacements
+    cleaned_name = name.strip()
+    for old, new in replacements.items():
+        cleaned_name = cleaned_name.replace(old, new)
+    
+    # Remove multiple spaces and standardize format
+    cleaned_name = ' '.join(cleaned_name.split())
+    
+    # Convert to title case but keep common abbreviations
+    words = cleaned_name.split()
+    cleaned_words = []
+    for word in words:
+        if word.upper() in ['MHS', 'CCU', 'CMHS']:  # Add more abbreviations as needed
+            cleaned_words.append(word.upper())
+        else:
+            cleaned_words.append(word.title())
+    
+    cleaned_name = ' '.join(cleaned_words)
+    
+    # Remove trailing/leading special characters
+    cleaned_name = cleaned_name.strip(' -_')
+    
+    return cleaned_name if cleaned_name else None
+
 @app.route("/api/initial_state", methods=['GET'])
 def initial_state():
     global DATA_DF
     
-    # Get unique facilities, filtering out NaN and non-string values
+    # Clean and normalize existing facility names
+    DATA_DF['facility'] = DATA_DF['facility'].apply(normalize_facility_name)
+    
+    # Get unique facilities, filtering out None values
     facilities = [f for f in DATA_DF['facility'].unique() 
-                 if isinstance(f, str) and not pd.isna(f)]
+                 if f is not None]
+    
+    # Sort facilities alphabetically
     facilities.sort()
-
-    # Create facility index mapping
+    
+    # Debug print to check the cleaned names
+    print("\nUnique Facility Names after cleaning:")
+    for f in facilities:
+        print(f)
+    
+    # Create facility mapping with normalized names
     facility_mapping = {idx: facility for idx, facility in enumerate(facilities, 1)}
     
-    # Create a dictionary of date ranges using facility indices
+    # Create date ranges with normalized names
     facility_date_ranges = {}
     for idx, facility in facility_mapping.items():
         facility_data = DATA_DF[DATA_DF['facility'] == facility]
@@ -126,13 +174,8 @@ def initial_state():
         facility_date_ranges[idx] = {
             "minDate": min_date.strftime("%Y-%m-%d"),
             "maxDate": max_date.strftime("%Y-%m-%d"),
-            "name": facility  # Include facility name for display purposes
+            "name": facility
         }
-    
-    # Debug print
-    print("Facility mappings and date ranges:")
-    for idx, data in facility_date_ranges.items():
-        print(f"Index {idx}: {data}")
     
     response_data = {
         "facilityMapping": facility_mapping,
