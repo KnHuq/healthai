@@ -359,15 +359,15 @@ const DropdownSearch = ({ label, searchTerm, setSearchTerm, selectedOption, setS
 const CombinedComparison = ({ wordSearchData, nlpData, customColors }) => {
   const [selectedKeys, setSelectedKeys] = useState([]);
   const [showTable, setShowTable] = useState(false);
-
-  // Add color pairs for each metric (distinct colors for Word Search and NLP)
-  const colorPairs = {
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [activeBarColor, setActiveBarColor] = useState(null);
+  const [colorPairs, setColorPairs] = useState({
     "Absent 5 P's Formulation": ['#8884d8', '#82ca9d'],
     "Inclusive 5 P's Formulation": ['#ffc658', '#ff7300'],
     "Inclusive Integrated Formulation": ['#e74c3c', '#3498db'],
     "Limited 5 P's Formulation": ['#2ecc71', '#8e44ad'],
     "Limited Integrated Formulation": ['#e67e22', '#387908']
-  };
+  });
 
   useEffect(() => {
     // Preselect first metric
@@ -487,19 +487,94 @@ const CombinedComparison = ({ wordSearchData, nlpData, customColors }) => {
               <h4 className="mb-0" style={{ fontSize: showTable ? '1.2rem' : '1.5rem' }}>
                 Comparison of Word Search vs NLP Methods
               </h4>
-              <MDBBtn 
-                color="light" 
-                size="sm" 
-                style={{ 
-                  whiteSpace: 'nowrap',
-                  minWidth: '100px',
-                  padding: '0.5rem 1rem'
-                }}
-                onClick={() => setShowTable(!showTable)}
-              >
-                {showTable ? 'Hide Table' : 'Show Table'}
-              </MDBBtn>
+              <div className="d-flex gap-2">
+                <MDBBtn 
+                  color="info" 
+                  size="sm"
+                  onClick={() => setShowColorPicker(!showColorPicker)}
+                >
+                  <MDBIcon fas icon="palette" className="me-2" />
+                  Bar Colors
+                </MDBBtn>
+                <MDBBtn 
+                  color="light" 
+                  size="sm" 
+                  onClick={() => setShowTable(!showTable)}
+                >
+                  {showTable ? 'Hide Table' : 'Show Table'}
+                </MDBBtn>
+              </div>
             </div>
+
+            {showColorPicker && (
+              <div className="mb-4 p-3 border rounded">
+                <h6 className="mb-3">Customize Bar Colors</h6>
+                {selectedKeys.map(key => (
+                  <div key={key} className="mb-3">
+                    <div className="d-flex align-items-center mb-2">
+                      <span className="me-2">{key}:</span>
+                    </div>
+                    <div className="d-flex gap-3 mb-2">
+                      <div>
+                        <small>Word Search</small>
+                        <button
+                          className="d-block mt-1"
+                          style={{
+                            width: '30px',
+                            height: '30px',
+                            background: colorPairs[key][0],
+                            border: '2px solid white',
+                            borderRadius: '6px',
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => setActiveBarColor([key, 0])}
+                        />
+                      </div>
+                      <div>
+                        <small>NLP</small>
+                        <button
+                          className="d-block mt-1"
+                          style={{
+                            width: '30px',
+                            height: '30px',
+                            background: colorPairs[key][1],
+                            border: '2px solid white',
+                            borderRadius: '6px',
+                            cursor: 'pointer'
+                          }}
+                          onClick={() => setActiveBarColor([key, 1])}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                {activeBarColor && (
+                  <div className="mt-3">
+                    <HexColorPicker
+                      color={colorPairs[activeBarColor[0]][activeBarColor[1]]}
+                      onChange={(color) => {
+                        setColorPairs(prev => ({
+                          ...prev,
+                          [activeBarColor[0]]: activeBarColor[1] === 0 ? 
+                            [color, prev[activeBarColor[0]][1]] : 
+                            [prev[activeBarColor[0]][0], color]
+                        }));
+                      }}
+                    />
+                    <MDBBtn 
+                      color="light" 
+                      size="sm" 
+                      className="mt-2"
+                      onClick={() => setActiveBarColor(null)}
+                    >
+                      Done
+                    </MDBBtn>
+                  </div>
+                )}
+              </div>
+            )}
+
             {renderCheckboxes()}
             <div className="text-center mb-2" style={{ fontSize: '0.9rem' }}>
               {selectedKeys.map(key => (
@@ -574,8 +649,12 @@ const CombinedComparison = ({ wordSearchData, nlpData, customColors }) => {
           <MDBCard className={`${customColors.cardBackground} ${customColors.textColor} my-3`}>
             <MDBCardBody>
               <h4 className="text-center mb-4">Comparison Data</h4>
-              <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
-                <MDBTable responsive>
+              <div style={{ 
+                maxHeight: '600px', 
+                overflowY: 'auto',
+                overflowX: 'auto'  // Add horizontal scroll
+              }}>
+                <MDBTable responsive className="table-responsive">
                   <MDBTableHead>
                     {renderTableHeaders()}
                   </MDBTableHead>
@@ -782,16 +861,63 @@ const TableBarAnalysis = () => {
             <MDBModalBody>
               <div className="mb-4">
                 <label className="form-label">Background Gradient</label>
-                <select 
-                  className="form-select"
-                  value={customColors.background}
-                  onChange={(e) => handleColorChange('background', e.target.value)}
-                >
-                  <option value="linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593)">Warm Sunset</option>
-                  <option value="linear-gradient(135deg, #f5f3ff 0%, #e9d5ff 50%, #ddd6fe 100%)">Purple Dream</option>
-                  <option value="linear-gradient(to right, #2c3e50, #3498db)">Ocean Blue</option>
-                  <option value="linear-gradient(to right, #134e5e, #71b280)">Forest Green</option>
-                </select>
+                <div className="mt-3 p-3 border rounded">
+                  <div className="d-flex justify-content-between mb-3">
+                    <div>
+                      <label className="form-label">Start Color</label>
+                      <button
+                        className="d-block"
+                        style={{
+                          width: '40px',
+                          height: '40px',
+                          background: customColors.gradientStart,
+                          border: '2px solid white',
+                          borderRadius: '6px',
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => setActiveColorPicker('gradientStart')}
+                      />
+                    </div>
+                    <div>
+                      <label className="form-label">End Color</label>
+                      <button
+                        className="d-block"
+                        style={{
+                          width: '40px',
+                          height: '40px',
+                          background: customColors.gradientEnd,
+                          border: '2px solid white',
+                          borderRadius: '6px',
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => setActiveColorPicker('gradientEnd')}
+                      />
+                    </div>
+                  </div>
+                  
+                  {activeColorPicker && (activeColorPicker === 'gradientStart' || activeColorPicker === 'gradientEnd') && (
+                    <div className="mt-3">
+                      <HexColorPicker
+                        color={customColors[activeColorPicker]}
+                        onChange={(color) => {
+                          setCustomColors(prev => ({
+                            ...prev,
+                            [activeColorPicker]: color,
+                            background: `linear-gradient(to right, ${activeColorPicker === 'gradientStart' ? color : prev.gradientStart}, ${activeColorPicker === 'gradientEnd' ? color : prev.gradientEnd})`
+                          }));
+                        }}
+                      />
+                      <MDBBtn 
+                        color="light" 
+                        size="sm" 
+                        className="mt-2"
+                        onClick={() => setActiveColorPicker(null)}
+                      >
+                        Done
+                      </MDBBtn>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="mb-4">
