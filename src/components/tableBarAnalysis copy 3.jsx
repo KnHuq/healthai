@@ -37,7 +37,6 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { createTheme, ThemeProvider, styled as muiStyled } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
 import styled from "styled-components";
-import { HexColorPicker } from "react-colorful";
 
 const DatePickerContainer = muiStyled("div")({
   display: "flex",
@@ -608,7 +607,6 @@ const TableBarAnalysis = () => {
     textColor: 'text-white',
     chartColors: ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#387908']
   });
-  const [activeColorPicker, setActiveColorPicker] = useState(null);
 
   useEffect(() => {
     const fetchInitialState = async () => {
@@ -783,12 +781,17 @@ const TableBarAnalysis = () => {
             </MDBModalHeader>
 
             <MDBModalBody>
-              <div className="mb-4">
+              <div className="mb-3">
                 <label className="form-label">Background Gradient</label>
                 <select 
                   className="form-select"
                   value={customColors.background}
-                  onChange={(e) => handleColorChange('background', e.target.value)}
+                  onChange={(e) => {
+                    setCustomColors(prev => ({
+                      ...prev,
+                      background: e.target.value
+                    }));
+                  }}
                 >
                   <option value="linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593)">Warm Sunset</option>
                   <option value="linear-gradient(135deg, #f5f3ff 0%, #e9d5ff 50%, #ddd6fe 100%)">Purple Dream</option>
@@ -797,65 +800,41 @@ const TableBarAnalysis = () => {
                 </select>
               </div>
 
-              <div className="mb-4">
+              <div className="mb-3">
                 <label className="form-label">Card Background</label>
-                <div className="d-flex align-items-center gap-3">
-                  <select 
-                    className="form-select"
-                    value={customColors.cardBackground}
-                    onChange={(e) => handleColorChange('cardBackground', e.target.value)}
-                  >
-                    <option value="bg-dark">Dark</option>
-                    <option value="bg-primary">Primary</option>
-                    <option value="bg-secondary">Secondary</option>
-                  </select>
-                  <button
-                    className="btn btn-outline-light"
-                    onClick={() => setActiveColorPicker('cardBackground')}
-                  >
-                    Custom Color
-                  </button>
-                </div>
+                <select 
+                  className="form-select"
+                  value={customColors.cardBackground}
+                  onChange={(e) => {
+                    setCustomColors(prev => ({
+                      ...prev,
+                      cardBackground: e.target.value
+                    }));
+                  }}
+                >
+                  <option value="bg-dark">Dark</option>
+                  <option value="bg-primary">Primary</option>
+                  <option value="bg-secondary">Secondary</option>
+                </select>
               </div>
 
-              <div className="mb-4">
+              <div className="mb-3">
                 <label className="form-label">Text Color</label>
-                <div className="d-flex align-items-center gap-3">
-                  <select 
-                    className="form-select"
-                    value={customColors.textColor}
-                    onChange={(e) => handleColorChange('textColor', e.target.value)}
-                  >
-                    <option value="text-white">White</option>
-                    <option value="text-dark">Dark</option>
-                    <option value="text-primary">Primary</option>
-                  </select>
-                  <button
-                    className="btn btn-outline-light"
-                    onClick={() => setActiveColorPicker('textColor')}
-                  >
-                    Custom Color
-                  </button>
-                </div>
+                <select 
+                  className="form-select"
+                  value={customColors.textColor}
+                  onChange={(e) => {
+                    setCustomColors(prev => ({
+                      ...prev,
+                      textColor: e.target.value
+                    }));
+                  }}
+                >
+                  <option value="text-white">White</option>
+                  <option value="text-dark">Dark</option>
+                  <option value="text-primary">Primary</option>
+                </select>
               </div>
-
-              {/* Color Picker */}
-              {activeColorPicker && (
-                <div className="mt-4">
-                  <HexColorPicker
-                    color={customColors[activeColorPicker]}
-                    onChange={(color) => handleColorChange(activeColorPicker, color)}
-                  />
-                  <MDBBtn 
-                    color='light' 
-                    size='sm' 
-                    className="mt-2"
-                    onClick={() => setActiveColorPicker(null)}
-                  >
-                    Done
-                  </MDBBtn>
-                </div>
-              )}
             </MDBModalBody>
 
             <MDBModalFooter>

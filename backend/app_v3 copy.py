@@ -481,13 +481,13 @@ def formulationtable_data():
         "data": data},
         {"title": "Comparison of Formulations in Selected Clinical Notes Over Time (NLP)",
         "data": data_LLM},
-        # {"title": "Comparison of Formulations in Selected Clinical Notes Over Time (NLP+ Word Search)",
-        # "data": data_LLM_words},
-        # {"title": "Comparision of the Clinical Note Templates (notes that have text) Over Time",
-        # "data": final_template_data},
-        {"title": "Number of Characters in the Clinical Notes",
+        {"title": "Comparison of Formulations in Selected Clinical Notes Over Time (NLP+ Word Search)",
+        "data": data_LLM_words},
+        {"title": "Comparision of the Clinical Note Templates (notes that have text) Over Time",
+        "data": final_template_data},
+        {"title": "Grouped Number of Characters in the Clinical Notes Over Time",
         "data": final_grouped_data},
-        { "title" : " Comparision of the Key Word Present in Clinical Notes",
+        { "title" : " Comparision of the Each Key Word Present in Selected Clinical Notes Over Time",
          "data": final_word_counts_data}
     ]
 

@@ -9,14 +9,6 @@ import {
   MDBTable,
   MDBTableBody,
   MDBTableHead,
-  MDBIcon,
-  MDBModal,
-  MDBModalDialog,
-  MDBModalContent,
-  MDBModalHeader,
-  MDBModalTitle,
-  MDBModalBody,
-  MDBModalFooter,
 } from "mdb-react-ui-kit";
 import {
   LineChart,
@@ -37,7 +29,6 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { createTheme, ThemeProvider, styled as muiStyled } from "@mui/material/styles";
 import TextField from "@mui/material/TextField";
 import styled from "styled-components";
-import { HexColorPicker } from "react-colorful";
 
 const DatePickerContainer = muiStyled("div")({
   display: "flex",
@@ -143,7 +134,7 @@ const CustomDropdownItem = styled.div`
   }
 `;
 
-const DataVisualization = ({ title, data, customColors }) => {
+const DataVisualization = ({ title, data }) => {
   const [selectedKeys, setSelectedKeys] = useState([]);
   const [showTable, setShowTable] = useState(false);
 
@@ -243,7 +234,7 @@ const DataVisualization = ({ title, data, customColors }) => {
   return (
     <MDBRow className="align-items-start">
       <MDBCol md={showTable ? "5" : "12"} className="p-2">
-        <MDBCard className={`${customColors.cardBackground} ${customColors.textColor} my-3`}>
+        <MDBCard className="bg-dark text-white my-3">
           <MDBCardBody>
             <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap">
               <h4 className="mb-0" style={{ fontSize: showTable ? '1.2rem' : '1.5rem' }}>{title} Line Chart</h4>
@@ -296,7 +287,7 @@ const DataVisualization = ({ title, data, customColors }) => {
       
       {showTable && (
         <MDBCol md="7" className="p-2">
-          <MDBCard className={`${customColors.cardBackground} ${customColors.textColor} my-3`}>
+          <MDBCard className="bg-dark text-white my-3">
             <MDBCardBody>
               <h4 className="text-center mb-4">{title} Data</h4>
               <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
@@ -355,7 +346,7 @@ const DropdownSearch = ({ label, searchTerm, setSearchTerm, selectedOption, setS
   );
 };
 
-const CombinedComparison = ({ wordSearchData, nlpData, customColors }) => {
+const CombinedComparison = ({ wordSearchData, nlpData }) => {
   const [selectedKeys, setSelectedKeys] = useState([]);
   const [showTable, setShowTable] = useState(false);
 
@@ -480,7 +471,7 @@ const CombinedComparison = ({ wordSearchData, nlpData, customColors }) => {
   return (
     <MDBRow className="align-items-start">
       <MDBCol md={showTable ? "5" : "12"} className="p-2">
-        <MDBCard className={`${customColors.cardBackground} ${customColors.textColor} my-3`}>
+        <MDBCard className="bg-dark text-white my-3">
           <MDBCardBody>
             <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap">
               <h4 className="mb-0" style={{ fontSize: showTable ? '1.2rem' : '1.5rem' }}>
@@ -570,7 +561,7 @@ const CombinedComparison = ({ wordSearchData, nlpData, customColors }) => {
       
       {showTable && (
         <MDBCol md="7" className="p-2">
-          <MDBCard className={`${customColors.cardBackground} ${customColors.textColor} my-3`}>
+          <MDBCard className="bg-dark text-white my-3">
             <MDBCardBody>
               <h4 className="text-center mb-4">Comparison Data</h4>
               <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
@@ -601,14 +592,6 @@ const TableBarAnalysis = () => {
   const [tuSpecialServiceTypeSearchTerm, setTuSpecialServiceTypeSearchTerm] = useState("");
   const [selectedTuSpecialServiceType, setSelectedTuSpecialServiceType] = useState("");
   const [tuSpecialServiceTypeOptions, setTuSpecialServiceTypeOptions] = useState([]);
-  const [settingsModal, setSettingsModal] = useState(false);
-  const [customColors, setCustomColors] = useState({
-    background: 'linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593)',
-    cardBackground: 'bg-dark',
-    textColor: 'text-white',
-    chartColors: ['#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#387908']
-  });
-  const [activeColorPicker, setActiveColorPicker] = useState(null);
 
   useEffect(() => {
     const fetchInitialState = async () => {
@@ -667,206 +650,71 @@ const TableBarAnalysis = () => {
     }
   };
 
-  const toggleSettings = () => {
-    setSettingsModal(!settingsModal);
-  };
-
-  const handleColorChange = (key, value) => {
-    setCustomColors(prev => ({
-      ...prev,
-      [key]: value
-    }));
-  };
-
   return (
-    <>
-      <MDBContainer 
-        fluid 
-        style={{ 
-          minHeight: '100vh',
-          background: customColors.background
-        }}
-      >
-        {/* Settings Button */}
-        <MDBBtn
-          floating
-          className='position-fixed'
-          style={{ top: '20px', right: '20px', zIndex: 1000 }}
-          color='light'
-          onClick={toggleSettings}
-        >
-          <MDBIcon fas icon='cog' />
-        </MDBBtn>
-
-        <MDBRow className="d-flex justify-content-center align-items-center h-100">
-          <MDBCol col="12">
-            <MDBRow className="align-items-center justify-content-center mb-4">
-              <MDBCol md="8" className="p-2">
-                <MDBCard className="bg-dark text-white">
-                  <MDBCardBody>
-                    <DropdownSearch
-                      label="Search Treating Unit"
-                      searchTerm={treatingUnitSearchTerm}
-                      setSearchTerm={setTreatingUnitSearchTerm}
-                      selectedOption={selectedTreatingUnit}
-                      setSelectedOption={setSelectedTreatingUnit}
-                      options={treatingUnitOptions}
-                    />
-                    {selectedTreatingUnit && <p className="mt-2">Selected Treating Unit: {selectedTreatingUnit}</p>}
-                    <DropdownSearch
-                      label="Search Special Service Type"
-                      searchTerm={tuSpecialServiceTypeSearchTerm}
-                      setSearchTerm={setTuSpecialServiceTypeSearchTerm}
-                      selectedOption={selectedTuSpecialServiceType}
-                      setSelectedOption={setSelectedTuSpecialServiceType}
-                      options={tuSpecialServiceTypeOptions}
-                    />
-                    {selectedTuSpecialServiceType && <p className="mt-2">Selected Special Service Type: {selectedTuSpecialServiceType}</p>}
-                    <DatePickerContainer>
-                      <ThemeProvider theme={darkTheme}>
-                        <LocalizationProvider dateAdapter={AdapterDateFns}>
-                          <DatePicker
-                            label="Start Date"
-                            value={startDate}
-                            onChange={(newValue) => setStartDate(newValue)}
-                            renderInput={(params) => <DarkTextField {...params} />}
-                          />
-                          <DatePicker
-                            label="End Date"
-                            value={endDate}
-                            onChange={(newValue) => setEndDate(newValue)}
-                            renderInput={(params) => <DarkTextField {...params} />}
-                          />
-                        </LocalizationProvider>
-                      </ThemeProvider>
-                    </DatePickerContainer>
-                    <div className="d-flex justify-content-center mt-3">
-                      <MDBBtn color="light" onClick={fetchData}>
-                        Fetch Data
-                      </MDBBtn>
-                    </div>
-                  </MDBCardBody>
-                </MDBCard>
-              </MDBCol>
-            </MDBRow>
-            
-            {/* Add the combined comparison chart first */}
-            {datasets.length >= 2 && (
-              <CombinedComparison 
-                wordSearchData={datasets[0].data} 
-                nlpData={datasets[1].data}
-                customColors={customColors}
+    <MDBContainer>
+      <MDBRow className="align-items-center justify-content-center mb-4">
+        <MDBCol md="8" className="p-2">
+          <MDBCard className="bg-dark text-white">
+            <MDBCardBody>
+              <DropdownSearch
+                label="Search Treating Unit"
+                searchTerm={treatingUnitSearchTerm}
+                setSearchTerm={setTreatingUnitSearchTerm}
+                selectedOption={selectedTreatingUnit}
+                setSelectedOption={setSelectedTreatingUnit}
+                options={treatingUnitOptions}
               />
-            )}
-            
-            {/* Filter out only the three specific charts */}
-            {datasets
-              .filter(dataset => ![
-                "Comparison of Formulations in Selected Clinical Notes Over Time (Word Search)",
-                "Comparison of Formulations in Selected Clinical Notes Over Time (NLP)",
-                "Comparison of Formulations in Selected Clinical Notes Over Time (NLP+ Word Search)"
-              ].includes(dataset.title))
-              .map((dataset, index) => (
-                <DataVisualization key={index} title={dataset.title} data={dataset.data} customColors={customColors} />
-              ))}
-          </MDBCol>
-        </MDBRow>
-      </MDBContainer>
-
-      {/* Settings Modal */}
-      <MDBModal open={settingsModal} tabIndex='-1' staticBackdrop>
-        <MDBModalDialog>
-          <MDBModalContent className={`${customColors.cardBackground} ${customColors.textColor}`}>
-            <MDBModalHeader>
-              <MDBModalTitle>Appearance Settings</MDBModalTitle>
-              <MDBBtn className='btn-close' color='none' onClick={toggleSettings}></MDBBtn>
-            </MDBModalHeader>
-
-            <MDBModalBody>
-              <div className="mb-4">
-                <label className="form-label">Background Gradient</label>
-                <select 
-                  className="form-select"
-                  value={customColors.background}
-                  onChange={(e) => handleColorChange('background', e.target.value)}
-                >
-                  <option value="linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593)">Warm Sunset</option>
-                  <option value="linear-gradient(135deg, #f5f3ff 0%, #e9d5ff 50%, #ddd6fe 100%)">Purple Dream</option>
-                  <option value="linear-gradient(to right, #2c3e50, #3498db)">Ocean Blue</option>
-                  <option value="linear-gradient(to right, #134e5e, #71b280)">Forest Green</option>
-                </select>
+              {selectedTreatingUnit && <p className="mt-2">Selected Treating Unit: {selectedTreatingUnit}</p>}
+              <DropdownSearch
+                label="Search Special Service Type"
+                searchTerm={tuSpecialServiceTypeSearchTerm}
+                setSearchTerm={setTuSpecialServiceTypeSearchTerm}
+                selectedOption={selectedTuSpecialServiceType}
+                setSelectedOption={setSelectedTuSpecialServiceType}
+                options={tuSpecialServiceTypeOptions}
+              />
+              {selectedTuSpecialServiceType && <p className="mt-2">Selected Special Service Type: {selectedTuSpecialServiceType}</p>}
+              <DatePickerContainer>
+                <ThemeProvider theme={darkTheme}>
+                  <LocalizationProvider dateAdapter={AdapterDateFns}>
+                    <DatePicker
+                      label="Start Date"
+                      value={startDate}
+                      onChange={(newValue) => setStartDate(newValue)}
+                      renderInput={(params) => <DarkTextField {...params} />}
+                    />
+                    <DatePicker
+                      label="End Date"
+                      value={endDate}
+                      onChange={(newValue) => setEndDate(newValue)}
+                      renderInput={(params) => <DarkTextField {...params} />}
+                    />
+                  </LocalizationProvider>
+                </ThemeProvider>
+              </DatePickerContainer>
+              <div className="d-flex justify-content-center mt-3">
+                <MDBBtn color="light" onClick={fetchData}>
+                  Fetch Data
+                </MDBBtn>
               </div>
-
-              <div className="mb-4">
-                <label className="form-label">Card Background</label>
-                <div className="d-flex align-items-center gap-3">
-                  <select 
-                    className="form-select"
-                    value={customColors.cardBackground}
-                    onChange={(e) => handleColorChange('cardBackground', e.target.value)}
-                  >
-                    <option value="bg-dark">Dark</option>
-                    <option value="bg-primary">Primary</option>
-                    <option value="bg-secondary">Secondary</option>
-                  </select>
-                  <button
-                    className="btn btn-outline-light"
-                    onClick={() => setActiveColorPicker('cardBackground')}
-                  >
-                    Custom Color
-                  </button>
-                </div>
-              </div>
-
-              <div className="mb-4">
-                <label className="form-label">Text Color</label>
-                <div className="d-flex align-items-center gap-3">
-                  <select 
-                    className="form-select"
-                    value={customColors.textColor}
-                    onChange={(e) => handleColorChange('textColor', e.target.value)}
-                  >
-                    <option value="text-white">White</option>
-                    <option value="text-dark">Dark</option>
-                    <option value="text-primary">Primary</option>
-                  </select>
-                  <button
-                    className="btn btn-outline-light"
-                    onClick={() => setActiveColorPicker('textColor')}
-                  >
-                    Custom Color
-                  </button>
-                </div>
-              </div>
-
-              {/* Color Picker */}
-              {activeColorPicker && (
-                <div className="mt-4">
-                  <HexColorPicker
-                    color={customColors[activeColorPicker]}
-                    onChange={(color) => handleColorChange(activeColorPicker, color)}
-                  />
-                  <MDBBtn 
-                    color='light' 
-                    size='sm' 
-                    className="mt-2"
-                    onClick={() => setActiveColorPicker(null)}
-                  >
-                    Done
-                  </MDBBtn>
-                </div>
-              )}
-            </MDBModalBody>
-
-            <MDBModalFooter>
-              <MDBBtn color='light' onClick={toggleSettings}>
-                Close
-              </MDBBtn>
-            </MDBModalFooter>
-          </MDBModalContent>
-        </MDBModalDialog>
-      </MDBModal>
-    </>
+            </MDBCardBody>
+          </MDBCard>
+        </MDBCol>
+      </MDBRow>
+      
+      {/* Add the combined comparison chart first */}
+      {datasets.length >= 2 && (
+        <CombinedComparison 
+          wordSearchData={datasets[0].data} 
+          nlpData={datasets[1].data}
+        />
+      )}
+      
+      {/* Existing visualizations */}
+      {datasets.map((dataset, index) => (
+        <DataVisualization key={index} title={dataset.title} data={dataset.data} />
+      ))}
+    </MDBContainer>
   );
 };
 
