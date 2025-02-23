@@ -111,14 +111,32 @@ def initial_state():
     # Get unique facilities, filtering out NaN and non-string values
     facilities = [f for f in DATA_DF['facility'].unique() 
                  if isinstance(f, str) and not pd.isna(f)]
-    facilities.sort()  # Sort alphabetically
+    facilities.sort()
+
+    # Create facility index mapping
+    facility_mapping = {idx: facility for idx, facility in enumerate(facilities, 1)}
+    
+    # Create a dictionary of date ranges using facility indices
+    facility_date_ranges = {}
+    for idx, facility in facility_mapping.items():
+        facility_data = DATA_DF[DATA_DF['facility'] == facility]
+        min_date = facility_data['eventdate'].min()
+        max_date = facility_data['eventdate'].max()
+        
+        facility_date_ranges[idx] = {
+            "minDate": min_date.strftime("%Y-%m-%d"),
+            "maxDate": max_date.strftime("%Y-%m-%d"),
+            "name": facility  # Include facility name for display purposes
+        }
+    
+    # Debug print
+    print("Facility mappings and date ranges:")
+    for idx, data in facility_date_ranges.items():
+        print(f"Index {idx}: {data}")
     
     response_data = {
-        "facilities": facilities,
-        "dateRange": {
-            "minDate": DATA_DF['eventdate'].min(),
-            "maxDate": DATA_DF['eventdate'].max()
-        }
+        "facilityMapping": facility_mapping,
+        "facilityDateRanges": facility_date_ranges
     }
 
     return jsonify(response_data)
@@ -131,20 +149,30 @@ def formulationtable_data():
     print('formulationtable_data is called.....')
     global DATA_DF
 
+    # Get facility index from query parameters and convert to int
+    facility_idx = int(request.args.get("facility"))
+    
+    # Get facility name from the mapping (recreate mapping)
+    facilities = [f for f in DATA_DF['facility'].unique() 
+                 if isinstance(f, str) and not pd.isna(f)]
+    facilities.sort()
+    facility_mapping = {idx: facility for idx, facility in enumerate(facilities, 1)}
+    
+    # Get actual facility name
+    facility_name = facility_mapping[facility_idx]
+
     # Extract start_date and end_date from query parameters
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")
-    facility = request.args.get("facility")
 
     start_date = pd.to_datetime(start_date, format="%Y-%m-%d", errors='coerce')
     end_date = pd.to_datetime(end_date, format="%Y-%m-%d", errors='coerce')
     
     # Create a copy of the filtered data to avoid SettingWithCopyWarning
     filtered_data = DATA_DF[(DATA_DF['eventdate'] >= start_date) & 
-                           (DATA_DF['eventdate'] <= end_date)].copy()
+                           (DATA_DF['eventdate'] <= end_date) &
+                           (DATA_DF['facility'] == facility_name)].copy()
     
-    filtered_data = filtered_data[filtered_data['facility'] == facility].copy()
-
     filtered_data.sort_values(by='eventdate', ascending=True, inplace=True)
     
     if filtered_data.empty:
@@ -231,7 +259,6 @@ def formulationtable_data():
     filtered_data['factors_LLM_words'][:len(final_p_llm_k)] = final_p_llm_k
 
 
-    # import pdb; pdb.set_trace()
 
     grouped_data = filtered_data.groupby('month')
 
@@ -239,7 +266,9 @@ def formulationtable_data():
     for group_n, group_df in grouped_data:
         d = group_df['factors'].value_counts().to_dict()
         d.update((group_df['iformula'].value_counts().to_dict()))
-        del d['Absent Integrated Formulation']
+        # drop 'Absent Integrated Formulation' if it exists
+        d.pop('Absent Integrated Formulation', None)
+
         final_dict[group_n.to_timestamp().isoformat()] = d
     
     data = []
@@ -270,7 +299,8 @@ def formulationtable_data():
     for group_n, group_df in grouped_data:
         d = group_df['factors_LLM'].value_counts().to_dict()
         d.update((group_df['iformula_LLM'].value_counts().to_dict()))
-        del d['Absent Integrated Formulation']
+        # drop 'Absent Integrated Formulation' if it exists
+        d.pop('Absent Integrated Formulation', None)
         final_dict_LLM[group_n.to_timestamp().isoformat()] = d
 
     data_LLM = []
@@ -299,7 +329,8 @@ def formulationtable_data():
     for group_n, group_df in grouped_data:
         d = group_df['factors_LLM_words'].value_counts().to_dict()
         d.update((group_df['iformula_LLM_words'].value_counts().to_dict()))
-        del d['Absent Integrated Formulation']
+        #  drop 'Absent Integrated Formulation' if it exists
+        d.pop('Absent Integrated Formulation', None)
         final_dict_LLM_words[group_n.to_timestamp().isoformat()] = d
 
     data_LLM_words = []

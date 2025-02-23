@@ -675,9 +675,10 @@ const TableBarAnalysis = () => {
   const [datasets, setDatasets] = useState([]);
   const [startDate, setStartDate] = useState(new Date("2018-03-15"));
   const [endDate, setEndDate] = useState(new Date("2018-07-15"));
+  const [facilityMapping, setFacilityMapping] = useState({});
+  const [selectedFacilityId, setSelectedFacilityId] = useState(null);
   const [facilitySearchTerm, setFacilitySearchTerm] = useState("");
-  const [selectedFacility, setSelectedFacility] = useState("");
-  const [facilityOptions, setFacilityOptions] = useState([]);
+  const [facilityDateRanges, setFacilityDateRanges] = useState({});
   const [settingsModal, setSettingsModal] = useState(false);
   const [customColors, setCustomColors] = useState({
     background: 'linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593)',
@@ -704,12 +705,8 @@ const TableBarAnalysis = () => {
           throw new Error("Network response was not ok");
         }
         const jsonData = await response.json();
-        setFacilityOptions(jsonData.facilities);
-        
-        // Set the date range from backend
-        setStartDate(new Date(jsonData.dateRange.minDate));
-        setEndDate(new Date(jsonData.dateRange.maxDate));
-        
+        setFacilityMapping(jsonData.facilityMapping);
+        setFacilityDateRanges(jsonData.facilityDateRanges);
       } catch (error) {
         console.error("Failed to fetch initial state:", error);
       }
@@ -718,11 +715,20 @@ const TableBarAnalysis = () => {
     fetchInitialState();
   }, []);
 
+  // Set date range when facility is selected
+  useEffect(() => {
+    if (selectedFacilityId && facilityDateRanges[selectedFacilityId]) {
+      const facilityRange = facilityDateRanges[selectedFacilityId];
+      setStartDate(new Date(facilityRange.minDate));
+      setEndDate(new Date(facilityRange.maxDate));
+    }
+  }, [selectedFacilityId]);
+
   const fetchData = async () => {
     const start = startDate.toISOString().split("T")[0];
     const end = endDate.toISOString().split("T")[0];
     
-    const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.FORMULATION_DATA}?start_date=${start}&end_date=${end}&facility=${selectedFacility}`;
+    const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.FORMULATION_DATA}?start_date=${start}&end_date=${end}&facility=${selectedFacilityId}`;
 
     const headers = new Headers();
     headers.append("ngrok-skip-browser-warning", "true");
@@ -781,38 +787,72 @@ const TableBarAnalysis = () => {
               <MDBCol md="8" className="p-2">
                 <MDBCard className="bg-dark text-white">
                   <MDBCardBody>
+                    {/* Facility Selection First */}
                     <DropdownSearch
                       label="Search Facilities"
                       searchTerm={facilitySearchTerm}
                       setSearchTerm={setFacilitySearchTerm}
-                      selectedOption={selectedFacility}
-                      setSelectedOption={setSelectedFacility}
-                      options={facilityOptions}
+                      selectedOption={selectedFacilityId ? facilityMapping[selectedFacilityId] : ""}
+                      setSelectedOption={(facilityName) => {
+                        // Find the ID for this facility name
+                        const id = Object.entries(facilityMapping)
+                          .find(([_, name]) => name === facilityName)?.[0];
+                        setSelectedFacilityId(id ? parseInt(id) : null);
+                      }}
+                      options={Object.values(facilityMapping)}
                     />
-                    {selectedFacility && <p className="mt-2">Selected Facility: {selectedFacility}</p>}
-                    <DatePickerContainer>
-                      <ThemeProvider theme={darkTheme}>
-                        <LocalizationProvider dateAdapter={AdapterDateFns}>
-                          <DatePicker
-                            label="Start Date"
-                            value={startDate}
-                            onChange={(newValue) => setStartDate(newValue)}
-                            renderInput={(params) => <DarkTextField {...params} />}
-                          />
-                          <DatePicker
-                            label="End Date"
-                            value={endDate}
-                            onChange={(newValue) => setEndDate(newValue)}
-                            renderInput={(params) => <DarkTextField {...params} />}
-                          />
-                        </LocalizationProvider>
-                      </ThemeProvider>
-                    </DatePickerContainer>
-                    <div className="d-flex justify-content-center mt-3">
-                      <MDBBtn color="light" onClick={fetchData}>
-                        Fetch Data
-                      </MDBBtn>
-                    </div>
+                    {selectedFacilityId && (
+                      <>
+                        <p className="mt-3 mb-2">
+                          Selected Facility: {facilityMapping[selectedFacilityId]}
+                          <br />
+                          <small className="text-muted">
+                            Available date range: {
+                              new Date(facilityDateRanges[selectedFacilityId].minDate).toLocaleDateString()
+                            } to {
+                              new Date(facilityDateRanges[selectedFacilityId].maxDate).toLocaleDateString()
+                            }
+                          </small>
+                        </p>
+                        
+                        {/* Date Pickers only shown after facility selection */}
+                        <DatePickerContainer>
+                          <ThemeProvider theme={darkTheme}>
+                            <LocalizationProvider dateAdapter={AdapterDateFns}>
+                              <DatePicker
+                                label="Start Date"
+                                value={startDate}
+                                onChange={(newValue) => setStartDate(newValue)}
+                                minDate={new Date(facilityDateRanges[selectedFacilityId].minDate)}
+                                maxDate={new Date(facilityDateRanges[selectedFacilityId].maxDate)}
+                                renderInput={(params) => <DarkTextField {...params} />}
+                              />
+                              <DatePicker
+                                label="End Date"
+                                value={endDate}
+                                onChange={(newValue) => setEndDate(newValue)}
+                                minDate={new Date(facilityDateRanges[selectedFacilityId].minDate)}
+                                maxDate={new Date(facilityDateRanges[selectedFacilityId].maxDate)}
+                                renderInput={(params) => <DarkTextField {...params} />}
+                              />
+                            </LocalizationProvider>
+                          </ThemeProvider>
+                        </DatePickerContainer>
+
+                        {/* Fetch button only shown when facility is selected */}
+                        <div className="d-flex justify-content-center mt-3">
+                          <MDBBtn color="light" onClick={fetchData}>
+                            Fetch Data
+                          </MDBBtn>
+                        </div>
+                      </>
+                    )}
+                    
+                    {!selectedFacilityId && (
+                      <p className="text-center mt-3 text-muted">
+                        Please select a facility to view available date ranges
+                      </p>
+                    )}
                   </MDBCardBody>
                 </MDBCard>
               </MDBCol>
