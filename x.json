@@ -1,0 +1,330 @@
+{
+    "facilityDateRanges": {
+        "1": {
+            "maxDate": "2020-10-23",
+            "minDate": "2020-10-23",
+            "name": "BAILLIE HENDERSON HOSPITAL"
+        },
+        "2": {
+            "maxDate": "2020-12-31",
+            "minDate": "2018-04-16",
+            "name": "CABOOLTURE ADULT COMMUNITY MHS"
+        },
+        "3": {
+            "maxDate": "2020-12-31",
+            "minDate": "2018-04-29",
+            "name": "CABOOLTURE HOSPITAL"
+        },
+        "4": {
+            "maxDate": "2020-04-29",
+            "minDate": "2020-04-29",
+            "name": "CAIRNS ADULT COMMUNITY MHS"
+        },
+        "5": {
+            "maxDate": "2020-12-31",
+            "minDate": "2018-04-27",
+            "name": "CHERMSIDE ADULT COMMUNITY MHS"
+        },
+        "6": {
+            "maxDate": "2020-12-31",
+            "minDate": "2018-04-19",
+            "name": "COMMUNITY FORENSIC MHS"
+        },
+        "7": {
+            "maxDate": "2020-07-02",
+            "minDate": "2018-05-09",
+            "name": "COOINDA HOUSE"
+        },
+        "8": {
+            "maxDate": "2020-12-14",
+            "minDate": "2020-11-20",
+            "name": "Caboolture Alcohol and Other Drugs Service"
+        },
+        "9": {
+            "maxDate": "2020-12-31",
+            "minDate": "2020-03-25",
+            "name": "Caboolture Youth Step Up Step Down Unit"
+        },
+        "10": {
+            "maxDate": "2019-09-25",
+            "minDate": "2019-09-24",
+            "name": "FRASER COAST ADULT COMMUNITY MHS"
+        },
+        "11": {
+            "maxDate": "2018-11-23",
+            "minDate": "2018-11-23",
+            "name": "GAILES COMMUNITY CARE UNIT"
+        },
+        "12": {
+            "maxDate": "2019-06-03",
+            "minDate": "2019-06-03",
+            "name": "GLADSTONE COMMUNITY MHS"
+        },
+        "13": {
+            "maxDate": "2020-12-31",
+            "minDate": "2017-04-02",
+            "name": "GOLD COAST UNIVERSITY HOSPITAL"
+        },
+        "14": {
+            "maxDate": "2019-02-07",
+            "minDate": "2019-02-07",
+            "name": "GOODNA ADULT COMMUNITY MHS"
+        },
+        "15": {
+            "maxDate": "2019-05-13",
+            "minDate": "2019-05-13",
+            "name": "GREENSLOPES CHILD &amp;amp; YOUTH COMMUNITY MHS"
+        },
+        "16": {
+            "maxDate": "2020-12-31",
+            "minDate": "2020-12-31",
+            "name": "Gold Coast Alcohol and Other Drugs Service"
+        },
+        "17": {
+            "maxDate": "2020-12-31",
+            "minDate": "2017-11-17",
+            "name": "INNER NORTH BRISBANE COMMUNITY MHS"
+        },
+        "18": {
+            "maxDate": "2019-01-09",
+            "minDate": "2018-10-26",
+            "name": "IPSWICH ADULT COMMUNITY MHS"
+        },
+        "19": {
+            "maxDate": "2019-11-22",
+            "minDate": "2019-11-22",
+            "name": "IPSWICH HOSPITAL"
+        },
+        "20": {
+            "maxDate": "2018-07-11",
+            "minDate": "2018-07-11",
+            "name": "LADY CILENTO CHILDREN'S HOSPITAL"
+        },
+        "21": {
+            "maxDate": "2020-11-14",
+            "minDate": "2020-07-16",
+            "name": "LOGAN CENTRAL ADULT COMMUNITY MHS"
+        },
+        "22": {
+            "maxDate": "2019-09-03",
+            "minDate": "2019-09-03",
+            "name": "LOGAN HOSPITAL"
+        },
+        "23": {
+            "maxDate": "2020-05-25",
+            "minDate": "2020-05-25",
+            "name": "LONGREACH COMMUNITY MHS"
+        },
+        "24": {
+            "maxDate": "2020-11-10",
+            "minDate": "2019-12-23",
+            "name": "MACKAY ADULT COMMUNITY MHS"
+        },
+        "25": {
+            "maxDate": "2019-03-05",
+            "minDate": "2019-03-05",
+            "name": "MAROOCHYDORE ADULT COMMUNITY MHS"
+        },
+        "26": {
+            "maxDate": "2018-11-27",
+            "minDate": "2018-11-26",
+            "name": "NAMBOUR ADULT COMMUNITY MHS"
+        },
+        "27": {
+            "maxDate": "2020-02-04",
+            "minDate": "2018-10-01",
+            "name": "North West Child &amp;amp; Youth Community MHS"
+        },
+        "28": {
+            "maxDate": "2020-08-24",
+            "minDate": "2020-04-06",
+            "name": "North West Child &amp;amp; Youth Community Mental Health Service"
+        },
+        "29": {
+            "maxDate": "2018-08-06",
+            "minDate": "2018-08-06",
+            "name": "Nundah Child &amp;amp; Youth Mental Health Service"
+        },
+        "30": {
+            "maxDate": "2020-12-31",
+            "minDate": "2018-04-26",
+            "name": "Nundah Community Mental Health Service"
+        },
+        "31": {
+            "maxDate": "2020-12-31",
+            "minDate": "2018-03-16",
+            "name": "PALM BEACH ADULT COMMUNITY MHS"
+        },
+        "32": {
+            "maxDate": "2020-12-30",
+            "minDate": "2018-04-29",
+            "name": "PINE RIVERS COMMUNITY CARE UNIT"
+        },
+        "33": {
+            "maxDate": "2020-12-30",
+            "minDate": "2018-04-24",
+            "name": "PINE RIVERS COMMUNITY MHS"
+        },
+        "34": {
+            "maxDate": "2020-12-31",
+            "minDate": "2018-04-16",
+            "name": "PRINCE CHARLES (THE) HOSPITAL"
+        },
+        "35": {
+            "maxDate": "2020-11-19",
+            "minDate": "2018-10-31",
+            "name": "PRINCESS ALEXANDRA HOSPITAL"
+        },
+        "36": {
+            "maxDate": "2020-12-12",
+            "minDate": "2020-11-13",
+            "name": "QUEENSLAND CHILDREN'S HOSPITAL"
+        },
+        "37": {
+            "maxDate": "2020-12-31",
+            "minDate": "2018-04-20",
+            "name": "REDCLIFFE ADULT COMMUNITY MHS"
+        },
+        "38": {
+            "maxDate": "2020-12-23",
+            "minDate": "2018-04-30",
+            "name": "REDCLIFFE-CABOOLTURE ADULT COMMUNITY MHS"
+        },
+        "39": {
+            "maxDate": "2020-12-31",
+            "minDate": "2018-04-30",
+            "name": "REDCLIFFE-CABOOLTURE CHILD &amp;amp; YOUTH COMMUNITY MHS"
+        },
+        "40": {
+            "maxDate": "2020-12-31",
+            "minDate": "2018-04-18",
+            "name": "REDCLIFFE-CABOOLTURE COMMUNITY CARE UNIT"
+        },
+        "41": {
+            "maxDate": "2020-12-31",
+            "minDate": "2018-04-20",
+            "name": "REDCLIFFE-CABOOLTURE CRISIS ASSESSMENT &amp;amp; TREATMENT COMMUNITY MHS"
+        },
+        "42": {
+            "maxDate": "2020-12-31",
+            "minDate": "2018-04-30",
+            "name": "ROBINA COMMUNITY MHS"
+        },
+        "43": {
+            "maxDate": "2020-12-31",
+            "minDate": "2018-04-28",
+            "name": "ROBINA HOSPITAL"
+        },
+        "44": {
+            "maxDate": "2020-01-14",
+            "minDate": "2020-01-14",
+            "name": "ROCKHAMPTON HOSPITAL"
+        },
+        "45": {
+            "maxDate": "2020-06-26",
+            "minDate": "2020-06-26",
+            "name": "ROYAL BRISBANE &amp; WOMEN'S HOSPITAL"
+        },
+        "46": {
+            "maxDate": "2020-12-31",
+            "minDate": "2018-01-15",
+            "name": "ROYAL BRISBANE &amp;amp; WOMEN'S HOSPITAL"
+        },
+        "47": {
+            "maxDate": "2020-12-31",
+            "minDate": "2018-05-08",
+            "name": "SOMERSET VILLAS COMMUNITY CARE UNIT"
+        },
+        "48": {
+            "maxDate": "2020-12-30",
+            "minDate": "2018-04-24",
+            "name": "SOUTHPORT CHILD &amp;amp; YOUTH COMMUNITY MENTAL HEALTH SERVICE"
+        },
+        "49": {
+            "maxDate": "2019-05-13",
+            "minDate": "2019-05-13",
+            "name": "SUNSHINE COAST CHILD &amp;amp; YOUTH COMMUNITY MHS"
+        },
+        "50": {
+            "maxDate": "2020-12-31",
+            "minDate": "2017-12-08",
+            "name": "Southport Adult Community MHS"
+        },
+        "51": {
+            "maxDate": "2019-06-12",
+            "minDate": "2018-05-03",
+            "name": "THE PARK CENTRE FOR MENTAL HEALTH"
+        },
+        "52": {
+            "maxDate": "2020-09-18",
+            "minDate": "2020-09-18",
+            "name": "TOOWOOMBA ADULT COMMUNITY MHS"
+        },
+        "53": {
+            "maxDate": "2019-11-22",
+            "minDate": "2019-07-02",
+            "name": "TOWNSVILLE ADULT COMMUNITY FORENSIC MHS"
+        },
+        "54": {
+            "maxDate": "2020-10-31",
+            "minDate": "2019-05-20",
+            "name": "WOOLLOONGABBA COMMUNITY MHS"
+        }
+    },
+    "facilityMapping": {
+        "1": "BAILLIE HENDERSON HOSPITAL",
+        "2": "CABOOLTURE ADULT COMMUNITY MHS",
+        "3": "CABOOLTURE HOSPITAL",
+        "4": "CAIRNS ADULT COMMUNITY MHS",
+        "5": "CHERMSIDE ADULT COMMUNITY MHS",
+        "6": "COMMUNITY FORENSIC MHS",
+        "7": "COOINDA HOUSE",
+        "8": "Caboolture Alcohol and Other Drugs Service",
+        "9": "Caboolture Youth Step Up Step Down Unit",
+        "10": "FRASER COAST ADULT COMMUNITY MHS",
+        "11": "GAILES COMMUNITY CARE UNIT",
+        "12": "GLADSTONE COMMUNITY MHS",
+        "13": "GOLD COAST UNIVERSITY HOSPITAL",
+        "14": "GOODNA ADULT COMMUNITY MHS",
+        "15": "GREENSLOPES CHILD &amp;amp; YOUTH COMMUNITY MHS",
+        "16": "Gold Coast Alcohol and Other Drugs Service",
+        "17": "INNER NORTH BRISBANE COMMUNITY MHS",
+        "18": "IPSWICH ADULT COMMUNITY MHS",
+        "19": "IPSWICH HOSPITAL",
+        "20": "LADY CILENTO CHILDREN'S HOSPITAL",
+        "21": "LOGAN CENTRAL ADULT COMMUNITY MHS",
+        "22": "LOGAN HOSPITAL",
+        "23": "LONGREACH COMMUNITY MHS",
+        "24": "MACKAY ADULT COMMUNITY MHS",
+        "25": "MAROOCHYDORE ADULT COMMUNITY MHS",
+        "26": "NAMBOUR ADULT COMMUNITY MHS",
+        "27": "North West Child &amp;amp; Youth Community MHS",
+        "28": "North West Child &amp;amp; Youth Community Mental Health Service",
+        "29": "Nundah Child &amp;amp; Youth Mental Health Service",
+        "30": "Nundah Community Mental Health Service",
+        "31": "PALM BEACH ADULT COMMUNITY MHS",
+        "32": "PINE RIVERS COMMUNITY CARE UNIT",
+        "33": "PINE RIVERS COMMUNITY MHS",
+        "34": "PRINCE CHARLES (THE) HOSPITAL",
+        "35": "PRINCESS ALEXANDRA HOSPITAL",
+        "36": "QUEENSLAND CHILDREN'S HOSPITAL",
+        "37": "REDCLIFFE ADULT COMMUNITY MHS",
+        "38": "REDCLIFFE-CABOOLTURE ADULT COMMUNITY MHS",
+        "39": "REDCLIFFE-CABOOLTURE CHILD &amp;amp; YOUTH COMMUNITY MHS",
+        "40": "REDCLIFFE-CABOOLTURE COMMUNITY CARE UNIT",
+        "41": "REDCLIFFE-CABOOLTURE CRISIS ASSESSMENT &amp;amp; TREATMENT COMMUNITY MHS",
+        "42": "ROBINA COMMUNITY MHS",
+        "43": "ROBINA HOSPITAL",
+        "44": "ROCKHAMPTON HOSPITAL",
+        "45": "ROYAL BRISBANE &amp; WOMEN'S HOSPITAL",
+        "46": "ROYAL BRISBANE &amp;amp; WOMEN'S HOSPITAL",
+        "47": "SOMERSET VILLAS COMMUNITY CARE UNIT",
+        "48": "SOUTHPORT CHILD &amp;amp; YOUTH COMMUNITY MENTAL HEALTH SERVICE",
+        "49": "SUNSHINE COAST CHILD &amp;amp; YOUTH COMMUNITY MHS",
+        "50": "Southport Adult Community MHS",
+        "51": "THE PARK CENTRE FOR MENTAL HEALTH",
+        "52": "TOOWOOMBA ADULT COMMUNITY MHS",
+        "53": "TOWNSVILLE ADULT COMMUNITY FORENSIC MHS",
+        "54": "WOOLLOONGABBA COMMUNITY MHS"
+    }
+}
