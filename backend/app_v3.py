@@ -9,63 +9,72 @@ from functools import reduce
 from tqdm import tqdm
 import numpy as np
 from config.server import HOST, PORT, DEBUG, ALLOWED_ORIGINS, DATA_PATH
-
+import ast
+import os
+import glob
 app = Flask(__name__)
 
 # Update CORS configuration using config
 CORS(app, resources={r"/*": {"origins": ALLOWED_ORIGINS}})
 
-# Load data using config path
-DATA_DF = pd.read_csv(DATA_PATH)
-DATA_DF['eventdate'] = pd.to_datetime(DATA_DF['eventdate'])
 
-# @app.route("/api/formulation_data")
-# def get_formulationline_data():
-#     global DATA_DF
-#     # Extract start_date and end_date from query parameters
-#     start_date = request.args.get("start_date")
-#     end_date = request.args.get("end_date")
-#     start_date = pd.to_datetime(start_date, format="%Y-%m-%d", errors='coerce')
-#     end_date = pd.to_datetime(end_date, format="%Y-%m-%d", errors='coerce')
 
-#     # filter the data
-#     filtered_data = DATA_DF[(DATA_DF['eventdate'] >= start_date) & (DATA_DF['eventdate'] <= end_date)]
-#     filtered_data.sort_values(by='eventdate', ascending=True, inplace=True)
-#     if filtered_data.empty:
-#         return jsonify([])
+def load_chunked_data(data_path):
+    # Get all CSV files in the chunks directory
+    data_path = os.path.join(data_path,'*.csv')
+    chunk_files = glob.glob(data_path)
     
-#     filtered_data['month'] = filtered_data['eventdate'].dt.to_period('M')
-#     all_results = list(map(get_formulation_label, list(filtered_data['formulationOverallClinicalImpression'])))
+    # Read and concatenate all chunks
+    dfs = []
+    for file in chunk_files:
+        df = pd.read_csv(file)
+        dfs.append(df)
+    
+    # Combine all chunks
+    combined_df = pd.concat(dfs, ignore_index=True)
+    
+    # Convert clinicalNoteDate to datetime
+    combined_df['clinicalNoteDate'] = pd.to_datetime(combined_df['clinicalNoteDate'], format='%d/%m/%Y')
+    
+    # Calculate text length and create groups
+    combined_df['char_len'] = combined_df['progressNote'].str.len()
+    
+    def get_char_len_group(length):
+        if length <= 250:
+            return '0-250'
+        elif length <= 500:
+            return '251-500'
+        elif length <= 1001:
+            return '501-1001'
+        elif length <= 2500:
+            return '1001-2500'
+        elif length <= 5000:
+            return '2501-5000'
+        else:
+            return '5001+'
+    
+    combined_df['grouped_char_len'] = combined_df['char_len'].apply(get_char_len_group)
+    
+    # Parse the extracted_values column from string to dictionary
+    combined_df['extracted_values'] = combined_df['extracted_values'].apply(ast.literal_eval)
+
+    # rename clinicalNoteDate to eventdate
+    combined_df.rename(columns={'clinicalNoteDate': 'eventdate'}, inplace=True)
+
+    # rename encounterFacility to facility
+    combined_df.rename(columns={'encounterFacility': 'facility'}, inplace=True)
+
+    # extracted_values is a dictionary we want to create a new column for each key in the dictionary
+    for key in combined_df['extracted_values'][0].keys():
+        combined_df[key] = combined_df['extracted_values'].apply(lambda x: x[key]['count'])
+    
+    return combined_df
 
 
-#     # group by month
-#     filtered_data['iformula'] = [i[0][0] for i in all_results]
-#     filtered_data['factors'] = [i[0][1] for i in all_results]
-#     grouped_data = filtered_data.groupby('month')
-#     final_dict = {}
-#     for group_n, group_df in grouped_data:
-#         d = group_df['factors'].value_counts().to_dict()
-#         d.update((group_df['iformula'].value_counts().to_dict()))
-#         del d['Absent Integrated Formulation']
-#         final_dict[group_n.to_timestamp().isoformat()] = d
-
-#     data = []
-
-#     for k, v in final_dict.items():
-#         d = {
-#             "month": k,
-#             "Limited Integrated Formulation":0,
-#             "Inclusive Integrated Formulation":0,
-#             "Limited 5 P's Formulation":0,
-#             "Absent 5 P's Formulation":0,
-#             "Inclusive 5 P's Formulation":0,
-
-#         }
-#         total = sum([v for k,v in v.items()])
-#         d.update({k: round((v/total)*100,2) for k, v in v.items()})
-#         data.append(d)
-#     print (data)
-#     return jsonify(data)
+# Load data using config path
+DATA_DF = load_chunked_data(DATA_PATH)
+# rename clinicalNoteDate to eventdate
+DATA_DF.rename(columns={'clinicalNoteDate': 'eventdate'}, inplace=True)
 
 table_data = [
     {
@@ -94,31 +103,18 @@ table_data = [
     }
 ]
 
-# @app.route('/api/formulation_data', methods=['GET'])
-# def get_formulation_data():
-#     start_date = request.args.get('start_date')
-#     end_date = request.args.get('end_date')
-    
-#     # In a real scenario, you would filter the data based on start_date and end_date
-#     # Here, we simply return all the data for simplicity
-
-#     response_data = {
-#         "bar_data": table_data,
-#         "line_data": table_data
-#     }
-#     return jsonify(response_data)
-
 
 @app.route("/api/initial_state", methods=['GET'])
 def initial_state():
     global DATA_DF
 
-    treating_unit = list(DATA_DF['TreatingUnitDesc'].unique()) 
-    tu_special_service_type = list(DATA_DF['TUSpecialServiceType'].unique())
-
+    facilities = list(DATA_DF['facility'].unique())
     response_data = {
-        "treating_unit": treating_unit,
-        "tu_special_service_type": tu_special_service_type
+        "facilities": facilities,
+        "dateRange": {
+            "minDate": DATA_DF['eventdate'].min(),
+            "maxDate": DATA_DF['eventdate'].max()
+        }
     }
 
     return jsonify(response_data)
@@ -128,29 +124,23 @@ def initial_state():
 
 @app.route("/api/formulation_data", methods=['GET'])
 def formulationtable_data():
-    print ('formulationtable_data is called.....')
-    # global DATA_DF
-
-    DATA  = "data/data_checkpoint.csv"
-    DATA_DF = pd.read_csv(DATA)
-    DATA_DF['eventdate'] = pd.to_datetime(DATA_DF['eventdate'])
+    print('formulationtable_data is called.....')
+    global DATA_DF
 
     # Extract start_date and end_date from query parameters
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")
-    treating_unit = request.args.get("treating_unit")
-    tu_special_service_type = request.args.get("tu_special_service_type")
-    # filter Template according to the option
+    facility = request.args.get("facility")
+
     start_date = pd.to_datetime(start_date, format="%Y-%m-%d", errors='coerce')
     end_date = pd.to_datetime(end_date, format="%Y-%m-%d", errors='coerce')
-    # filter the data
-    filtered_data = DATA_DF[(DATA_DF['eventdate'] >= start_date) & (DATA_DF['eventdate'] <= end_date)]
+    
+    # Create a copy of the filtered data to avoid SettingWithCopyWarning
+    filtered_data = DATA_DF[(DATA_DF['eventdate'] >= start_date) & 
+                           (DATA_DF['eventdate'] <= end_date)].copy()
+    
+    filtered_data = filtered_data[filtered_data['facility'] == facility].copy()
 
-    filtered_data = filtered_data[
-        (filtered_data['TreatingUnitDesc'] == treating_unit) &
-        (filtered_data['TUSpecialServiceType'] == tu_special_service_type)
-    ]
-    print (f'filtered_data length: {len(filtered_data)}')
     filtered_data.sort_values(by='eventdate', ascending=True, inplace=True)
     
     if filtered_data.empty:
@@ -158,43 +148,15 @@ def formulationtable_data():
         return jsonify([])
     
     filtered_data['month'] = filtered_data['eventdate'].dt.to_period('M')
-    all_texts = list(filtered_data['formulationOverallClinicalImpression'])
+    all_texts = list(filtered_data['progressNote'])
     print (f' length of all_texts: {len(all_texts)}')
     all_results = list(map(get_formulation_label, all_texts))
-    # all_results_LLM = []
-    # for text in tqdm(all_texts):
-    #     all_results_LLM.append(get_formulation_label_LLM(text))
 
-    # print (f'all results:--> {[i[0][:2] for i in all_results]}')
-    # print (f'all results LLM:--> {[i[0][:2] for i in all_results_LLM]}')
-    # group by month
-    # import pdb; pdb.set_trace()
     filtered_data['iformula'] = [i[0][0] for i in all_results]
     filtered_data['factors'] = [i[0][1] for i in all_results]
     filtered_data['key_words'] = [r[0][-2] for r in all_results]
-
     filtered_data['ps_stat'] = [r[0][-1] for r in all_results]
-
-
-
-
-    #### LLM DATA ####
-    # filtered_data['iformula_LLM'] = [i[0][0] for i in all_results_LLM]
-    # filtered_data['factors_LLM'] = [i[0][1] for i in all_results_LLM]
-    # filtered_data['key_words_LLM'] = [r[0][-1] for r in all_results_LLM]
-    # grouped_data_LLM = filtered_data.groupby('month')
-    # final_dict_LLM = {}
-    # for group_n, group_df in grouped_data_LLM:
-    #     d = group_df['factors_LLM'].value_counts().to_dict()
-    #     d.update((group_df['iformula_LLM'].value_counts().to_dict()))
-    #     try:
-    #         del d['Absent Integrated Formulation']
-    #     except:
-    #         pass
-
-    #     final_dict_LLM[group_n.to_timestamp().isoformat()] = d
-
-
+    
     ps_dict = defaultdict(list)
     for v_dict in filtered_data['ps_stat']:
         for k,v in v_dict.items():
@@ -357,62 +319,15 @@ def formulationtable_data():
         d.update({k: v for k, v in v.items()})
         data_LLM_words.append(d)
 
-    # for k, v in final_dict_LLM.items():
-    #     d = {
-    #         "month": k,
-    #         "Limited Integrated Formulation":0,
-    #         "Inclusive Integrated Formulation":0,
-    #         "Limited 5 P's Formulation":0,
-    #         "Absent 5 P's Formulation":0,
-    #         "Inclusive 5 P's Formulation":0,
-    #         "Limited Integrated Formulation (%)":0,
-    #         "Inclusive Integrated Formulation (%)":0,
-    #         "Limited 5 P's Formulation (%)":0,
-    #         "Absent 5 P's Formulation (%)":0,
-    #         "Inclusive 5 P's Formulation (%)":0,
 
-
-    #     }
-    #     total = sum([v for k,v in v.items()])
-    #     d.update({k+ " (%)": round((v/total)*100,2) for k, v in v.items()})
-    #     d.update({k: v for k, v in v.items()})
-    #     data_LLM.append(d)
-        
-    # response_data = {
-    #     "bar_data": data,
-    #     "line_data": data
-    # }
-
-
-
-    ############## TEMPLATE DATA ################
-
-    final_template_data = []
-    for group_n, group_df in grouped_data:
-            template_data = {
-            'Case Review': 0,
-            'Transfer of Care': 0,
-            'Longitudinal Summary': 0,
-            'Focused Assessment plus Substance Use': 0,
-            'Child and Youth Mental Health Assessment': 0,
-            'Focused Assessment': 0,
-            'Comprehensive Assessment': 0,
-            'Forensic Comprehensive Assessment': 0}
-
-            d = group_df["Template"].value_counts().to_dict()
-            template_data.update(d)
-            total = sum([v for k,v in template_data.items()])
-            template_data.update({k+ " (%)": round((v/total)*100,2) for k, v in template_data.items()})    
-            template_data['month'] = group_n.to_timestamp().isoformat()
-            final_template_data.append(template_data)
 
     ################# GROUP DATA ####################
-    group_df['grouped_char_len'].value_counts().to_dict()
 
+    grouped_data = filtered_data.groupby('month')
     final_grouped_data = []
 
-
-    replaced_data_dict = {
+    # Define the character length ranges
+    char_ranges = {
         '0-250': "Notes less than 250 characters",
         '251-500': "Notes with 251-500 characters",
         '501-1001': "Notes with 501-1001 characters",
@@ -421,69 +336,68 @@ def formulationtable_data():
         '5001+': "Notes with 5001+ characters"
     }
 
-
     for group_n, group_df in grouped_data:
-        grouped_data_dict = {
-            '0-250': 0,
-            '251-500': 0,
-            '501-1001': 0,
-            '1001-2500': 0,
-            '2501-5000': 0,
-            '5001+': 0
-        }
         d = group_df['grouped_char_len'].value_counts().to_dict()
-        grouped_data_dict.update(d)
-        changed_grouped_data = {}
-        for k,v in grouped_data_dict.items():
-            changed_grouped_data[replaced_data_dict[k]] = v
-        grouped_data_dict = changed_grouped_data
+        
+        grouped_data_dict = {
+            "Notes less than 250 characters": 0,
+            "Notes with 251-500 characters": 0,
+            "Notes with 501-1001 characters": 0,
+            "Notes with 1001-2500 characters": 0,
+            "Notes with 2501-5000 characters": 0,
+            "Notes with 5001+ characters": 0
+        }
+        
+        # Update counts with actual data
+        for k, v in d.items():
+            if k in char_ranges:
+                grouped_data_dict[char_ranges[k]] = v
 
-        total = sum([v for k,v in grouped_data_dict.items()])
-        grouped_data_dict.update({k+ " (%)": round((v/total)*100,2) for k, v in grouped_data_dict.items()})
+        # Calculate percentages using a list of keys to avoid dictionary size change
+        total = sum(grouped_data_dict.values())
+        if total > 0:
+            keys = list(grouped_data_dict.keys())  # Create a list of keys first
+            for k in keys:
+                grouped_data_dict[k + " (%)"] = round((grouped_data_dict[k] / total) * 100, 2)
+
         grouped_data_dict['month'] = group_n.to_timestamp().isoformat()
-        
-        
         final_grouped_data.append(grouped_data_dict)
 
     ######## WORD COUNT DATA ########
-
     word_counts_dict = {}
     for group_n, group_df in grouped_data:
-        g_d = dict(Counter(sum(list(group_df['key_words']),[])))
-        word_counts_dict[group_n.to_timestamp().isoformat()] = g_d
+        # Ensure key_words is a list before trying to count
+        if 'key_words' in group_df.columns:
+            words = [word for words in group_df['key_words'].dropna() for word in words if words]
+            word_counts = Counter(words)
+            word_counts_dict[group_n.to_timestamp().isoformat()] = dict(word_counts)
 
-    # only keep those keys which are present in each of the date
-    v_list = []
-    for k,v in word_counts_dict.items():
-        v_list.append(list(v.keys()))
-    # from the list of list only get the items that are present in each of the list
-    
-    common_keys = list(reduce(set.intersection, [set(item) for item in v_list]))
+    # Get common words across all months
+    if word_counts_dict:
+        
+        # all_words = set.intersection(*[set(d.keys()) for d in word_counts_dict.values()])
+        #@ get all the words from the values of each key
+        all_words = set.union(*[set(d.keys()) for d in word_counts_dict.values()])
+        
+        final_word_counts_data = []
+        for date, counts in word_counts_dict.items():
+            d = {'month': date}
+            total = sum(counts.values())
+            for word in all_words:
+                count = counts.get(word, 0)
+                d[word] = count
+                d[f"{word} (%)"] = round((count / total) * 100, 2) if total > 0 else 0
+            final_word_counts_data.append(d)
+    else:
+        final_word_counts_data = []
 
-    final_word_counts_data = []
-    for date,v in word_counts_dict.items():
-        d = {}
-        for c_k in common_keys:
-            total = sum([v2 for k2,v2 in v.items()])
-            for k2,v2 in v.items():
-                if k2 in common_keys:
-                    d[k2] = v2
-                    d[k2+" (%)"] = round((v2/total)*100,2)            
-        d['month'] = date
-        final_word_counts_data.append(d)
-
-
-
+    # import pdb; pdb.set_trace()
     response_data = [
 
         {"title": "Comparison of Formulations in Selected Clinical Notes Over Time (Word Search)",
         "data": data},
         {"title": "Comparison of Formulations in Selected Clinical Notes Over Time (NLP)",
         "data": data_LLM},
-        # {"title": "Comparison of Formulations in Selected Clinical Notes Over Time (NLP+ Word Search)",
-        # "data": data_LLM_words},
-        # {"title": "Comparision of the Clinical Note Templates (notes that have text) Over Time",
-        # "data": final_template_data},
         {"title": "Number of Characters in the Clinical Notes",
         "data": final_grouped_data},
         { "title" : " Comparision of the Key Word Present in Clinical Notes",
@@ -493,80 +407,6 @@ def formulationtable_data():
 
     return jsonify(response_data)
 
-
- 
-
-
-
-
-
-# @app.route('/api/formulationtable_data', methods=['GET'])
-# def get_formulationtable_data():
-#     print('table data is callled')
-#     data = {
-#         "headers": [
-#             "Groupings of Key Formulation Words",
-#             "Number of Formulations (FebMar 2021)",
-#             "% of Formulations with Key Word Groupings (FebMar 2021)",
-#             "Number of Formulations (AugSept 2021)",
-#             "% of Formulations with Key Word Groupings (AugSept 2021)"
-#         ],
-#         "percentage": [
-#             { "name": "Absent 5 P's Formulation", "FebMar2021": 31.8, "AugSept2021": 24.3 },
-#             { "name": "Limited 5 P's Formulation", "FebMar2021": 31.6, "AugSept2021": 32.3 },
-#             { "name": "Inclusive 5 P's Formulation", "FebMar2021": 36.7, "AugSept2021": 43.4 },
-#             { "name": "Limited Integrated Formulation", "FebMar2021": 15.8, "AugSept2021": 17.6 },
-#             { "name": "Inclusive Integrated Formulation", "FebMar2021": 0.4, "AugSept2021": 1.4 },
-#         ],
-#         "number": [
-#             { "name": "Absent 5 P's Formulation", "FebMar2021": 500, "AugSept2021": 342 },
-#             { "name": "Limited 5 P's Formulation", "FebMar2021": 497, "AugSept2021": 454 },
-#             { "name": "Inclusive 5 P's Formulation", "FebMar2021": 577, "AugSept2021": 611 },
-#             { "name": "Limited Integrated Formulation", "FebMar2021": 249, "AugSept2021": 247 },
-#             { "name": "Inclusive Integrated Formulation", "FebMar2021": 7, "AugSept2021": 19 },
-#         ]
-#     }
-#     return jsonify(data)
-
-
-
-# table_data = [{'month': '2019-05-01T00:00:00',
-#   'Limited Integrated Formulation': 10,
-#   'Inclusive Integrated Formulation': 0,
-#   "Limited 5 P's Formulation": 84,
-#   "Absent 5 P's Formulation": 33,
-#   "Inclusive 5 P's Formulation": 31,
-#   'Limited Integrated Formulation (%)': 6.33,
-#   'Inclusive Integrated Formulation (%)': 0,
-#   "Limited 5 P's Formulation (%)": 53.16,
-#   "Absent 5 P's Formulation (%)": 20.89,
-#   "Inclusive 5 P's Formulation (%)": 19.62},
-#  {'month': '2019-06-01T00:00:00',
-#   'Limited Integrated Formulation': 215,
-#   'Inclusive Integrated Formulation': 0,
-#   "Limited 5 P's Formulation": 1016,
-#   "Absent 5 P's Formulation": 535,
-#   "Inclusive 5 P's Formulation": 404,
-#   'Limited Integrated Formulation (%)': 9.91,
-#   'Inclusive Integrated Formulation (%)': 0,
-#   "Limited 5 P's Formulation (%)": 46.82,
-#   "Absent 5 P's Formulation (%)": 24.65,
-#   "Inclusive 5 P's Formulation (%)": 18.62},
-#  {'month': '2019-07-01T00:00:00',
-#   'Limited Integrated Formulation': 204,
-#   'Inclusive Integrated Formulation': 0,
-#   "Limited 5 P's Formulation": 1001,
-#   "Absent 5 P's Formulation": 609,
-#   "Inclusive 5 P's Formulation": 399,
-#   'Limited Integrated Formulation (%)': 9.22,
-#   'Inclusive Integrated Formulation (%)': 0,
-#   "Limited 5 P's Formulation (%)": 45.23,
-#   "Absent 5 P's Formulation (%)": 27.52,
-#   "Inclusive 5 P's Formulation (%)": 18.03}]
-
-# @app.route('/api/formulationtable_data', methods=['GET'])
-# def get_table_data():
-#     return jsonify(table_data)
 
 
 if __name__ == "__main__":

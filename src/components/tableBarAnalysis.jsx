@@ -675,12 +675,9 @@ const TableBarAnalysis = () => {
   const [datasets, setDatasets] = useState([]);
   const [startDate, setStartDate] = useState(new Date("2018-03-15"));
   const [endDate, setEndDate] = useState(new Date("2018-07-15"));
-  const [treatingUnitSearchTerm, setTreatingUnitSearchTerm] = useState("");
-  const [selectedTreatingUnit, setSelectedTreatingUnit] = useState("");
-  const [treatingUnitOptions, setTreatingUnitOptions] = useState([]);
-  const [tuSpecialServiceTypeSearchTerm, setTuSpecialServiceTypeSearchTerm] = useState("");
-  const [selectedTuSpecialServiceType, setSelectedTuSpecialServiceType] = useState("");
-  const [tuSpecialServiceTypeOptions, setTuSpecialServiceTypeOptions] = useState([]);
+  const [facilitySearchTerm, setFacilitySearchTerm] = useState("");
+  const [selectedFacility, setSelectedFacility] = useState("");
+  const [facilityOptions, setFacilityOptions] = useState([]);
   const [settingsModal, setSettingsModal] = useState(false);
   const [customColors, setCustomColors] = useState({
     background: 'linear-gradient(to right, #ee7724, #d8363a, #dd3675, #b44593)',
@@ -707,8 +704,12 @@ const TableBarAnalysis = () => {
           throw new Error("Network response was not ok");
         }
         const jsonData = await response.json();
-        setTreatingUnitOptions(jsonData.treating_unit);
-        setTuSpecialServiceTypeOptions(jsonData.tu_special_service_type);
+        setFacilityOptions(jsonData.facilities);
+        
+        // Set the date range from backend
+        setStartDate(new Date(jsonData.dateRange.minDate));
+        setEndDate(new Date(jsonData.dateRange.maxDate));
+        
       } catch (error) {
         console.error("Failed to fetch initial state:", error);
       }
@@ -721,7 +722,7 @@ const TableBarAnalysis = () => {
     const start = startDate.toISOString().split("T")[0];
     const end = endDate.toISOString().split("T")[0];
     
-    const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.FORMULATION_DATA}?start_date=${start}&end_date=${end}&treating_unit=${selectedTreatingUnit}&tu_special_service_type=${selectedTuSpecialServiceType}`;
+    const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.FORMULATION_DATA}?start_date=${start}&end_date=${end}&facility=${selectedFacility}`;
 
     const headers = new Headers();
     headers.append("ngrok-skip-browser-warning", "true");
@@ -781,23 +782,14 @@ const TableBarAnalysis = () => {
                 <MDBCard className="bg-dark text-white">
                   <MDBCardBody>
                     <DropdownSearch
-                      label="Search Treating Unit"
-                      searchTerm={treatingUnitSearchTerm}
-                      setSearchTerm={setTreatingUnitSearchTerm}
-                      selectedOption={selectedTreatingUnit}
-                      setSelectedOption={setSelectedTreatingUnit}
-                      options={treatingUnitOptions}
+                      label="Search Facilities"
+                      searchTerm={facilitySearchTerm}
+                      setSearchTerm={setFacilitySearchTerm}
+                      selectedOption={selectedFacility}
+                      setSelectedOption={setSelectedFacility}
+                      options={facilityOptions}
                     />
-                    {selectedTreatingUnit && <p className="mt-2">Selected Treating Unit: {selectedTreatingUnit}</p>}
-                    <DropdownSearch
-                      label="Search Special Service Type"
-                      searchTerm={tuSpecialServiceTypeSearchTerm}
-                      setSearchTerm={setTuSpecialServiceTypeSearchTerm}
-                      selectedOption={selectedTuSpecialServiceType}
-                      setSelectedOption={setSelectedTuSpecialServiceType}
-                      options={tuSpecialServiceTypeOptions}
-                    />
-                    {selectedTuSpecialServiceType && <p className="mt-2">Selected Special Service Type: {selectedTuSpecialServiceType}</p>}
+                    {selectedFacility && <p className="mt-2">Selected Facility: {selectedFacility}</p>}
                     <DatePickerContainer>
                       <ThemeProvider theme={darkTheme}>
                         <LocalizationProvider dateAdapter={AdapterDateFns}>

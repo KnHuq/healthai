@@ -11,4 +11,4 @@ ALLOWED_ORIGINS = [
 ]
 
 # Data paths
-DATA_PATH = "data/data_checkpoint.csv"
+DATA_PATH = "data/chunks"
