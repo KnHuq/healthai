@@ -38,6 +38,7 @@ import { createTheme, ThemeProvider, styled as muiStyled } from "@mui/material/s
 import TextField from "@mui/material/TextField";
 import styled from "styled-components";
 import { HexColorPicker } from "react-colorful";
+import API_CONFIG from '../config/api.js';
 
 const DatePickerContainer = muiStyled("div")({
   display: "flex",
@@ -612,20 +613,17 @@ const TableBarAnalysis = () => {
 
   useEffect(() => {
     const fetchInitialState = async () => {
-      // const url = "https://capable-lamprey-widely.ngrok-free.app/api/initial_state";
-      // const url = "http://10.225.71.89:5001/api/initial_state";
-      const url = "http://192.168.0.10:5001/api/initial_state";
-
       const headers = new Headers();
       headers.append("ngrok-skip-browser-warning", "true");
 
-      const requestOptions = {
-        method: "GET",
-        headers: headers,
-      };
-
       try {
-        const response = await fetch(url, requestOptions);
+        const response = await fetch(
+          `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.INITIAL_STATE}`,
+          {
+            method: "GET",
+            headers: headers,
+          }
+        );
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
@@ -643,9 +641,8 @@ const TableBarAnalysis = () => {
   const fetchData = async () => {
     const start = startDate.toISOString().split("T")[0];
     const end = endDate.toISOString().split("T")[0];
-    // const url = `https://capable-lamprey-widely.ngrok-free.app/api/formulation_data?start_date=${start}&end_date=${end}&treating_unit=${selectedTreatingUnit}&tu_special_service_type=${selectedTuSpecialServiceType}`;
-    // const url = `http://10.225.71.89:5001/api/formulation_data?start_date=${start}&end_date=${end}&treating_unit=${selectedTreatingUnit}&tu_special_service_type=${selectedTuSpecialServiceType}`;
-    const url = `http://192.168.0.10:5001/api/formulation_data?start_date=${start}&end_date=${end}&treating_unit=${selectedTreatingUnit}&tu_special_service_type=${selectedTuSpecialServiceType}`;
+    
+    const url = `${API_CONFIG.BASE_URL}${API_CONFIG.ENDPOINTS.FORMULATION_DATA}?start_date=${start}&end_date=${end}&treating_unit=${selectedTreatingUnit}&tu_special_service_type=${selectedTuSpecialServiceType}`;
 
     const headers = new Headers();
     headers.append("ngrok-skip-browser-warning", "true");

@@ -4,21 +4,20 @@ from datetime import datetime
 import pandas as pd
 from lib.formula_cal import get_formulation_label, get_grouping_label
 from lib.formula_cal_LLM import get_formulation_label_LLM
-from collections import Counter
+from collections import Counter, defaultdict
 from functools import reduce
 from tqdm import tqdm
-from collections import defaultdict
 import numpy as np
+from config.server import HOST, PORT, DEBUG, ALLOWED_ORIGINS, DATA_PATH
+
 app = Flask(__name__)
-# CORS(app,  resources={r"/*": {"origins": "http://10.225.71.89:3000"}})  # This will enable CORS for all routes
 
-# Update the CORS configuration to allow both IP and localhost
-CORS(app, resources={r"/*": {"origins": ["http://192.168.0.10:3000", "http://localhost:3000"]}})
+# Update CORS configuration using config
+CORS(app, resources={r"/*": {"origins": ALLOWED_ORIGINS}})
 
-DATA  = "data/data_checkpoint.csv"
-DATA_DF = pd.read_csv(DATA)
+# Load data using config path
+DATA_DF = pd.read_csv(DATA_PATH)
 DATA_DF['eventdate'] = pd.to_datetime(DATA_DF['eventdate'])
-
 
 # @app.route("/api/formulation_data")
 # def get_formulationline_data():
@@ -571,7 +570,4 @@ def formulationtable_data():
 
 
 if __name__ == "__main__":
-    # add ip of 0.0.0.0 and port of 8080
-    # add ip and port in the frontend
-    app.run(host='0.0.0.0', port=5001, debug=True)
-    # app.run(port=5000, debug=True)
+    app.run(host=HOST, port=PORT, debug=DEBUG)
