@@ -67,7 +67,7 @@ def load_chunked_data(data_path):
     # extracted_values is a dictionary we want to create a new column for each key in the dictionary
     for key in combined_df['extracted_values'][0].keys():
         combined_df[key] = combined_df['extracted_values'].apply(lambda x: x[key]['count'])
-    
+    print (combined_df.shape)
     return combined_df
 
 
@@ -76,6 +76,7 @@ DATA_DF = load_chunked_data(DATA_PATH)
 # rename clinicalNoteDate to eventdate
 DATA_DF.rename(columns={'clinicalNoteDate': 'eventdate'}, inplace=True)
 
+print (DATA_DF.head())
 table_data = [
     {
         "month": "2019-05-01T00:00:00",
@@ -103,12 +104,15 @@ table_data = [
     }
 ]
 
-
 @app.route("/api/initial_state", methods=['GET'])
 def initial_state():
     global DATA_DF
-
-    facilities = list(DATA_DF['facility'].unique())
+    
+    # Get unique facilities, filtering out NaN and non-string values
+    facilities = [f for f in DATA_DF['facility'].unique() 
+                 if isinstance(f, str) and not pd.isna(f)]
+    facilities.sort()  # Sort alphabetically
+    
     response_data = {
         "facilities": facilities,
         "dateRange": {
